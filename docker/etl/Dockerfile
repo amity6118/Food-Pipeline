@@ -27,4 +27,4 @@ USER etl
 
 # Invoked through bash so the script works even if a Windows checkout drops the exec bit
 ENTRYPOINT ["bash", "/app/docker/etl/entrypoint.sh"]
-CMD ["python", "-m", "src.utils.healthcheck"]
+CMD ["python", "run_pipeline.py", "--schedule"]

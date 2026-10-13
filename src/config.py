@@ -43,7 +43,18 @@ LOG_DIR = PROJECT_ROOT / "logs"
 for _directory in (DATA_LANDING_DIR, DATA_ARCHIVE_DIR, DATA_ERROR_DIR, LOG_DIR):
     _directory.mkdir(parents=True, exist_ok=True)
 
-# Logging & alerts
+# Scheduling
+PIPELINE_CRON_SCHEDULE = os.getenv("PIPELINE_CRON_SCHEDULE", "0 2 * * *")
+PIPELINE_TIMEZONE = os.getenv("PIPELINE_TIMEZONE", "Asia/Kolkata")
+RUN_ON_STARTUP = os.getenv("RUN_ON_STARTUP", "false").lower() == "true"
+
+# Logging & failure alerts
 LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO")
-ALERT_CHANNEL = os.getenv("ALERT_CHANNEL", "console")
+ALERT_CHANNEL = os.getenv("ALERT_CHANNEL", "console")  # comma list: console,webhook,email
 ALERT_WEBHOOK_URL = os.getenv("ALERT_WEBHOOK_URL", "")
+SMTP_HOST = os.getenv("SMTP_HOST", "")
+SMTP_PORT = int(os.getenv("SMTP_PORT", "587"))
+SMTP_USER = os.getenv("SMTP_USER", "")
+SMTP_PASSWORD = os.getenv("SMTP_PASSWORD", "")
+ALERT_EMAIL_FROM = os.getenv("ALERT_EMAIL_FROM", "")
+ALERT_EMAIL_TO = os.getenv("ALERT_EMAIL_TO", "")

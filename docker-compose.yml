@@ -65,13 +65,14 @@ services:
     networks:
       - pipeline_net
 
-  # ETL worker: ingestion, DQ checks, stored-procedure calls and scheduling.
+  # ETL worker: runs the pipeline on PIPELINE_CRON_SCHEDULE (APScheduler).
+  # One-off runs: docker compose run --rm etl python run_pipeline.py --date YYYY-MM-DD
   etl:
     build:
       context: .
       dockerfile: docker/etl/Dockerfile
     container_name: food_order_etl
-    restart: "no"
+    restart: unless-stopped
     depends_on:
       mysql:
         condition: service_healthy
@@ -88,7 +89,7 @@ services:
     volumes:
       # Live-mount the project so code changes need no image rebuild
       - .:/app
-    command: ["python", "-m", "src.utils.healthcheck"]
+    command: ["python", "run_pipeline.py", "--schedule"]
     networks:
       - pipeline_net
 

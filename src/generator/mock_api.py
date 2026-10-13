@@ -44,8 +44,9 @@ def list_orders(
     page_size: int = Query(500, ge=1, le=1000),
 ) -> dict[str, Any]:
     """One page of the orders placed on `date`, each with its order items."""
-    if not CALENDAR_START <= order_date <= CALENDAR_END:
-        raise HTTPException(status_code=422, detail=f"date must be between {CALENDAR_START} and {CALENDAR_END}")
+    latest = min(CALENDAR_END, date.today())
+    if not CALENDAR_START <= order_date <= latest:
+        raise HTTPException(status_code=422, detail=f"date must be between {CALENDAR_START} and {latest}")
 
     orders = _orders_for(order_date)
     total_pages = max(1, ceil(len(orders) / page_size))

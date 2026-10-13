@@ -17,11 +17,17 @@ def make_batch_id(run_date: date) -> str:
 
 
 def parse_run_date(value: str) -> date:
-    """argparse type for run dates: "YYYY-MM-DD" or "today", within the simulation range."""
+    """argparse type for run dates: "YYYY-MM-DD" or "today".
+
+    Dates must be inside the dim_date calendar and not in the future: a real
+    order feed cannot contain tomorrow's orders (and the warehouse DQ rules
+    would rightly fail them).
+    """
     try:
         run_date = date.today() if value == "today" else date.fromisoformat(value)
     except ValueError as exc:
         raise argparse.ArgumentTypeError(f"invalid date {value!r}; expected YYYY-MM-DD") from exc
-    if not CALENDAR_START <= run_date <= CALENDAR_END:
-        raise argparse.ArgumentTypeError(f"date must be between {CALENDAR_START} and {CALENDAR_END}")
+    latest = min(CALENDAR_END, date.today())
+    if not CALENDAR_START <= run_date <= latest:
+        raise argparse.ArgumentTypeError(f"date must be between {CALENDAR_START} and {latest}")
     return run_date
