@@ -35,16 +35,7 @@ can report on.
 
 ## Architecture
 
-```mermaid
-flowchart LR
-    SRC["Sources<br/>Mock Orders API (JSON)<br/>CSV master data"] --> ING["Ingestion (Python)<br/>extract · validate<br/>parse · bulk load"]
-    ING --> STG[("food_staging<br/>raw VARCHAR tables<br/>+ audit columns")]
-    STG --> SP["Stored procedures<br/>sp_load_dim_*<br/>sp_load_fact_*"]
-    SP --> DW[("food_dw<br/>star schema")]
-    SP <--> CTL[("food_control<br/>job log · DQ rules<br/>watermarks")]
-    DW --> PBI["Power BI Desktop"]
-    CTL --> PBI
-```
+![Architecture: sources flow through Python ingestion, MySQL staging, stored-procedure ETL and the food_dw warehouse to Power BI, with orchestration, data quality and monitoring layers](docs/images/architecture.svg)
 
 | Layer | Responsibility |
 |---|---|
@@ -79,16 +70,7 @@ flowchart LR
 
 ## Data model
 
-```mermaid
-erDiagram
-    dim_date ||--o{ fact_orders : date_key
-    dim_customer ||--o{ fact_orders : customer_key
-    dim_restaurant ||--o{ fact_orders : restaurant_key
-    dim_delivery_partner ||--o{ fact_orders : delivery_partner_key
-    dim_payment_method ||--o{ fact_orders : payment_method_key
-    fact_orders ||--o{ fact_order_items : order_key
-    dim_menu_item ||--o{ fact_order_items : menu_item_key
-```
+![food_dw star schema: fact_orders and fact_order_items joined to six dimensions](docs/images/star_schema.svg)
 
 | Table | Grain / type | Notes |
 |---|---|---|
@@ -135,7 +117,8 @@ food-order-pipeline/
 ├── .env.example                # copy to .env and set real passwords
 ├── requirements.txt
 ├── docs/
-│   └── ARCHITECTURE.md         # detailed diagrams
+│   ├── ARCHITECTURE.md         # detailed diagrams
+│   └── images/                 # README images (architecture, star schema)
 ├── docker/
 │   ├── etl/                    # ETL image (Python 3.11) + entrypoint
 │   └── mock_api/               # FastAPI image

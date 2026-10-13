@@ -1,0 +1,15 @@
+# Keep secrets, runtime data and VCS metadata out of image build contexts
+.env
+.git
+.gitignore
+.venv
+venv
+**/__pycache__
+**/*.py[cod]
+.pytest_cache
+.vscode
+.idea
+data
+logs
+docs
+*.md

@@ -7,6 +7,8 @@ Docker runtime topology.
 
 ## 1. End-to-end data flow
 
+![Food Order ETL Pipeline Architecture](images/architecture.svg)
+
 ```mermaid
 flowchart LR
     subgraph SRC["1 · SOURCES"]

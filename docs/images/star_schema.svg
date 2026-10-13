@@ -1,0 +1,531 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 1080" width="1440" height="1080" role="img" aria-labelledby="star-title star-desc">
+  <title id="star-title">food_dw Star Schema Architecture</title>
+  <desc id="star-desc">Enterprise Star Schema data warehouse schema for food_dw showing fact_orders, fact_order_items, and six surrounding dimension tables with primary and foreign key relationships.</desc>
+
+  <defs>
+    <!-- Card Drop Shadow -->
+    <filter id="schema-card-shadow" x="-5%" y="-5%" width="110%" height="110%" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="4" stdDeviation="5" flood-color="#0f172a" flood-opacity="0.08"/>
+    </filter>
+
+    <!-- Table Header Gradients -->
+    <!-- Fact Orders (Deep Royal Blue) -->
+    <linearGradient id="hdr-fact-orders" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#1e3a8a"/>
+      <stop offset="100%" stop-color="#2563eb"/>
+    </linearGradient>
+    <!-- Fact Order Items (Cobalt Blue) -->
+    <linearGradient id="hdr-fact-items" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#1d4ed8"/>
+      <stop offset="100%" stop-color="#3b82f6"/>
+    </linearGradient>
+    <!-- Dim Date (Emerald Green) -->
+    <linearGradient id="hdr-dim-date" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#065f46"/>
+      <stop offset="100%" stop-color="#059669"/>
+    </linearGradient>
+    <!-- Dim Customer (Violet Purple - SCD2) -->
+    <linearGradient id="hdr-dim-customer" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#581c87"/>
+      <stop offset="100%" stop-color="#7c3aed"/>
+    </linearGradient>
+    <!-- Dim Restaurant (Amber Orange - SCD2) -->
+    <linearGradient id="hdr-dim-restaurant" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#9a3412"/>
+      <stop offset="100%" stop-color="#d97706"/>
+    </linearGradient>
+    <!-- Dim Menu Item (Rose Crimson) -->
+    <linearGradient id="hdr-dim-menu" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#9f1239"/>
+      <stop offset="100%" stop-color="#e11d48"/>
+    </linearGradient>
+    <!-- Dim Delivery Partner (Sky Blue) -->
+    <linearGradient id="hdr-dim-partner" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#0369a1"/>
+      <stop offset="100%" stop-color="#0284c7"/>
+    </linearGradient>
+    <!-- Dim Payment Method (Teal Cyan) -->
+    <linearGradient id="hdr-dim-payment" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#0f766e"/>
+      <stop offset="100%" stop-color="#0d9488"/>
+    </linearGradient>
+
+    <!-- Connectors Markers -->
+    <marker id="dot-green" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6">
+      <circle cx="5" cy="5" r="4" fill="#059669"/>
+    </marker>
+    <marker id="dot-purple" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6">
+      <circle cx="5" cy="5" r="4" fill="#7c3aed"/>
+    </marker>
+    <marker id="dot-orange" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6">
+      <circle cx="5" cy="5" r="4" fill="#d97706"/>
+    </marker>
+    <marker id="dot-blue" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6">
+      <circle cx="5" cy="5" r="4" fill="#0284c7"/>
+    </marker>
+    <marker id="dot-teal" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6">
+      <circle cx="5" cy="5" r="4" fill="#0d9488"/>
+    </marker>
+    <marker id="dot-rose" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6">
+      <circle cx="5" cy="5" r="4" fill="#e11d48"/>
+    </marker>
+  </defs>
+
+  <style>
+    .bg { fill: #f8fafc; }
+    .title-main { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 26px; font-weight: 800; fill: #0f172a; }
+    .title-sub { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 14px; font-weight: 500; fill: #64748b; }
+    .tbl-title { font-family: "JetBrains Mono", Consolas, "SF Mono", monospace; font-size: 14.5px; font-weight: 700; fill: #ffffff; }
+    .tbl-sub { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 11px; font-weight: 600; fill: #ffffff; opacity: 0.9; }
+    .col-name { font-family: "JetBrains Mono", Consolas, "SF Mono", monospace; font-size: 12px; font-weight: 600; fill: #1e293b; }
+    .col-name-bold { font-family: "JetBrains Mono", Consolas, "SF Mono", monospace; font-size: 12px; font-weight: 700; fill: #0f172a; }
+    .col-type { font-family: "JetBrains Mono", Consolas, "SF Mono", monospace; font-size: 11px; font-weight: 500; fill: #64748b; }
+    .card-bg { fill: #ffffff; stroke: #cbd5e1; stroke-width: 1.5; }
+    .card-fact-bg { fill: #ffffff; stroke: #3b82f6; stroke-width: 2; }
+    .badge-pk-bg { fill: #fef3c7; }
+    .badge-pk-txt { font-family: -apple-system, BlinkMacSystemFont, sans-serif; font-size: 9.5px; font-weight: 800; fill: #92400e; }
+    .badge-fk-bg { fill: #dbeafe; }
+    .badge-fk-txt { font-family: -apple-system, BlinkMacSystemFont, sans-serif; font-size: 9.5px; font-weight: 800; fill: #1e40af; }
+    .badge-nk-bg { fill: #f3e8ff; }
+    .badge-nk-txt { font-family: -apple-system, BlinkMacSystemFont, sans-serif; font-size: 9.5px; font-weight: 800; fill: #6b21a8; }
+    .conn-label { font-family: -apple-system, BlinkMacSystemFont, sans-serif; font-size: 11px; font-weight: 700; }
+  </style>
+
+  <!-- Canvas Background -->
+  <rect class="bg" width="1440" height="1080" rx="16"/>
+
+  <!-- Title Header -->
+  <g transform="translate(45, 45)">
+    <text x="0" y="0" class="title-main">food_dw — Enterprise Star Schema</text>
+    <text x="0" y="24" class="title-sub">Optimized for Power BI Analytics · 2 Fact Tables · 6 Dimensions · Fully Indexed Foreign Keys · MySQL 8</text>
+  </g>
+
+  <!-- ====================================================================== -->
+  <!-- RELATIONSHIP CONNECTOR LINES                                           -->
+  <!-- ====================================================================== -->
+
+  <!-- 1. dim_date -> fact_orders (Green) -->
+  <path d="M 320 185 H 450 V 270 H 560" fill="none" stroke="#059669" stroke-width="2" marker-start="url(#dot-green)" marker-end="url(#dot-green)"/>
+  <rect x="325" y="172" width="22" height="16" rx="3" fill="#d1fae5"/>
+  <text x="336" y="184" class="conn-label" fill="#065f46" text-anchor="middle">1</text>
+  <rect x="532" y="258" width="22" height="16" rx="3" fill="#d1fae5"/>
+  <text x="543" y="270" class="conn-label" fill="#065f46" text-anchor="middle">N</text>
+
+  <!-- 2. dim_customer -> fact_orders (Purple) -->
+  <path d="M 320 500 H 430 V 300 H 560" fill="none" stroke="#7c3aed" stroke-width="2" marker-start="url(#dot-purple)" marker-end="url(#dot-purple)"/>
+  <rect x="325" y="488" width="22" height="16" rx="3" fill="#ede9fe"/>
+  <text x="336" y="500" class="conn-label" fill="#581c87" text-anchor="middle">1</text>
+  <rect x="532" y="288" width="22" height="16" rx="3" fill="#ede9fe"/>
+  <text x="543" y="300" class="conn-label" fill="#581c87" text-anchor="middle">N</text>
+
+  <!-- 3. dim_restaurant -> fact_orders (Orange) -->
+  <path d="M 320 860 H 450 V 330 H 560" fill="none" stroke="#d97706" stroke-width="2" marker-start="url(#dot-orange)" marker-end="url(#dot-orange)"/>
+  <rect x="325" y="848" width="22" height="16" rx="3" fill="#fef3c7"/>
+  <text x="336" y="860" class="conn-label" fill="#9a3412" text-anchor="middle">1</text>
+  <rect x="532" y="318" width="22" height="16" rx="3" fill="#fef3c7"/>
+  <text x="543" y="330" class="conn-label" fill="#9a3412" text-anchor="middle">N</text>
+
+  <!-- 4. dim_delivery_partner -> fact_orders (Sky Blue) -->
+  <path d="M 1120 185 H 990 V 360 H 880" fill="none" stroke="#0284c7" stroke-width="2" marker-start="url(#dot-blue)" marker-end="url(#dot-blue)"/>
+  <rect x="1093" y="172" width="22" height="16" rx="3" fill="#e0f2fe"/>
+  <text x="1104" y="184" class="conn-label" fill="#0369a1" text-anchor="middle">1</text>
+  <rect x="886" y="348" width="22" height="16" rx="3" fill="#e0f2fe"/>
+  <text x="897" y="360" class="conn-label" fill="#0369a1" text-anchor="middle">N</text>
+
+  <!-- 5. dim_payment_method -> fact_orders (Teal) -->
+  <path d="M 1120 460 H 1010 V 390 H 880" fill="none" stroke="#0d9488" stroke-width="2" marker-start="url(#dot-teal)" marker-end="url(#dot-teal)"/>
+  <rect x="1093" y="448" width="22" height="16" rx="3" fill="#ccfbf1"/>
+  <text x="1104" y="460" class="conn-label" fill="#0f766e" text-anchor="middle">1</text>
+  <rect x="886" y="378" width="22" height="16" rx="3" fill="#ccfbf1"/>
+  <text x="897" y="390" class="conn-label" fill="#0f766e" text-anchor="middle">N</text>
+
+  <!-- 6. fact_orders -> fact_order_items (Lineage 1-to-N) -->
+  <path d="M 720 635 V 710" fill="none" stroke="#2563eb" stroke-width="2.5" marker-start="url(#dot-blue)" marker-end="url(#dot-blue)"/>
+  <rect x="730" y="645" width="22" height="16" rx="3" fill="#dbeafe"/>
+  <text x="741" y="657" class="conn-label" fill="#1e3a8a" text-anchor="middle">1</text>
+  <rect x="730" y="688" width="22" height="16" rx="3" fill="#dbeafe"/>
+  <text x="741" y="700" class="conn-label" fill="#1e3a8a" text-anchor="middle">N</text>
+
+  <!-- 7. dim_menu_item -> fact_order_items (Rose) -->
+  <path d="M 1120 830 H 1000 V 780 H 880" fill="none" stroke="#e11d48" stroke-width="2" marker-start="url(#dot-rose)" marker-end="url(#dot-rose)"/>
+  <rect x="1093" y="818" width="22" height="16" rx="3" fill="#ffe4e6"/>
+  <text x="1104" y="830" class="conn-label" fill="#9f1239" text-anchor="middle">1</text>
+  <rect x="886" y="768" width="22" height="16" rx="3" fill="#ffe4e6"/>
+  <text x="897" y="780" class="conn-label" fill="#9f1239" text-anchor="middle">N</text>
+
+  <!-- ====================================================================== -->
+  <!-- DIMENSION TABLES (LEFT COLUMN)                                         -->
+  <!-- ====================================================================== -->
+
+  <!-- 1. DIM_DATE -->
+  <g id="tbl-dim-date" transform="translate(40, 110)">
+    <rect width="280" height="260" rx="8" class="card-bg" filter="url(#schema-card-shadow)"/>
+    <path d="M 0 8 Q 0 0 8 0 L 272 0 Q 280 0 280 8 L 280 44 L 0 44 Z" fill="url(#hdr-dim-date)"/>
+    <text x="16" y="24" class="tbl-title">dim_date</text>
+    <text x="16" y="38" class="tbl-sub">Calendar 2023–2027 · Holidays</text>
+
+    <!-- Rows -->
+    <g transform="translate(16, 64)">
+      <!-- date_key (PK) -->
+      <text x="0" y="0" class="col-name-bold">date_key</text>
+      <text x="195" y="0" class="col-type">INT</text>
+      <rect x="228" y="-10" width="24" height="14" rx="3" class="badge-pk-bg"/>
+      <text x="240" y="0" class="badge-pk-txt" text-anchor="middle">PK</text>
+
+      <rect x="-16" y="8" width="280" height="22" fill="#f8fafc"/>
+      <text x="0" y="24" class="col-name">full_date</text>
+      <text x="195" y="24" class="col-type">DATE</text>
+
+      <text x="0" y="48" class="col-name">year</text>
+      <text x="195" y="48" class="col-type">SMALLINT</text>
+
+      <rect x="-16" y="56" width="280" height="22" fill="#f8fafc"/>
+      <text x="0" y="72" class="col-name">quarter</text>
+      <text x="195" y="72" class="col-type">TINYINT</text>
+
+      <text x="0" y="96" class="col-name">month_name</text>
+      <text x="195" y="96" class="col-type">VARCHAR</text>
+
+      <rect x="-16" y="104" width="280" height="22" fill="#f8fafc"/>
+      <text x="0" y="120" class="col-name">day_name</text>
+      <text x="195" y="120" class="col-type">VARCHAR</text>
+
+      <text x="0" y="144" class="col-name">is_weekend</text>
+      <text x="195" y="144" class="col-type">BOOL</text>
+
+      <rect x="-16" y="152" width="280" height="22" fill="#f8fafc"/>
+      <text x="0" y="168" class="col-name">is_holiday</text>
+      <text x="195" y="168" class="col-type">BOOL</text>
+
+      <text x="0" y="190" class="col-name">holiday_name</text>
+      <text x="195" y="190" class="col-type">VARCHAR</text>
+    </g>
+  </g>
+
+  <!-- 2. DIM_CUSTOMER (SCD Type 2) -->
+  <g id="tbl-dim-customer" transform="translate(40, 400)">
+    <rect width="280" height="280" rx="8" class="card-bg" filter="url(#schema-card-shadow)"/>
+    <path d="M 0 8 Q 0 0 8 0 L 272 0 Q 280 0 280 8 L 280 44 L 0 44 Z" fill="url(#hdr-dim-customer)"/>
+    <text x="16" y="24" class="tbl-title">dim_customer</text>
+    <text x="16" y="38" class="tbl-sub">SCD Type 2 · Full History</text>
+
+    <g transform="translate(16, 64)">
+      <!-- customer_key (PK) -->
+      <text x="0" y="0" class="col-name-bold">customer_key</text>
+      <text x="195" y="0" class="col-type">INT</text>
+      <rect x="228" y="-10" width="24" height="14" rx="3" class="badge-pk-bg"/>
+      <text x="240" y="0" class="badge-pk-txt" text-anchor="middle">PK</text>
+
+      <rect x="-16" y="8" width="280" height="22" fill="#f8fafc"/>
+      <text x="0" y="24" class="col-name">customer_id</text>
+      <text x="195" y="24" class="col-type">VARCHAR</text>
+      <rect x="228" y="14" width="24" height="14" rx="3" class="badge-nk-bg"/>
+      <text x="240" y="24" class="badge-nk-txt" text-anchor="middle">NK</text>
+
+      <text x="0" y="48" class="col-name">customer_name</text>
+      <text x="195" y="48" class="col-type">VARCHAR</text>
+
+      <rect x="-16" y="56" width="280" height="22" fill="#f8fafc"/>
+      <text x="0" y="72" class="col-name">city</text>
+      <text x="195" y="72" class="col-type">VARCHAR</text>
+
+      <text x="0" y="96" class="col-name">signup_date</text>
+      <text x="195" y="96" class="col-type">DATE</text>
+
+      <rect x="-16" y="104" width="280" height="22" fill="#f8fafc"/>
+      <text x="0" y="120" class="col-name">scd_version</text>
+      <text x="195" y="120" class="col-type">INT</text>
+
+      <text x="0" y="144" class="col-name">is_active</text>
+      <text x="195" y="144" class="col-type">BOOL</text>
+
+      <rect x="-16" y="152" width="280" height="22" fill="#f8fafc"/>
+      <text x="0" y="168" class="col-name">valid_from</text>
+      <text x="195" y="168" class="col-type">DATETIME</text>
+
+      <text x="0" y="190" class="col-name">valid_to</text>
+      <text x="195" y="190" class="col-type">DATETIME</text>
+    </g>
+  </g>
+
+  <!-- 3. DIM_RESTAURANT (SCD Type 2) -->
+  <g id="tbl-dim-restaurant" transform="translate(40, 710)">
+    <rect width="280" height="280" rx="8" class="card-bg" filter="url(#schema-card-shadow)"/>
+    <path d="M 0 8 Q 0 0 8 0 L 272 0 Q 280 0 280 8 L 280 44 L 0 44 Z" fill="url(#hdr-dim-restaurant)"/>
+    <text x="16" y="24" class="tbl-title">dim_restaurant</text>
+    <text x="16" y="38" class="tbl-sub">SCD Type 2 · Indian Metros</text>
+
+    <g transform="translate(16, 64)">
+      <text x="0" y="0" class="col-name-bold">restaurant_key</text>
+      <text x="195" y="0" class="col-type">INT</text>
+      <rect x="228" y="-10" width="24" height="14" rx="3" class="badge-pk-bg"/>
+      <text x="240" y="0" class="badge-pk-txt" text-anchor="middle">PK</text>
+
+      <rect x="-16" y="8" width="280" height="22" fill="#f8fafc"/>
+      <text x="0" y="24" class="col-name">restaurant_id</text>
+      <text x="195" y="24" class="col-type">VARCHAR</text>
+      <rect x="228" y="14" width="24" height="14" rx="3" class="badge-nk-bg"/>
+      <text x="240" y="24" class="badge-nk-txt" text-anchor="middle">NK</text>
+
+      <text x="0" y="48" class="col-name">name</text>
+      <text x="195" y="48" class="col-type">VARCHAR</text>
+
+      <rect x="-16" y="56" width="280" height="22" fill="#f8fafc"/>
+      <text x="0" y="72" class="col-name">cuisine_type</text>
+      <text x="195" y="72" class="col-type">VARCHAR</text>
+
+      <text x="0" y="96" class="col-name">city</text>
+      <text x="195" y="96" class="col-type">VARCHAR</text>
+
+      <rect x="-16" y="104" width="280" height="22" fill="#f8fafc"/>
+      <text x="0" y="120" class="col-name">cost_for_two</text>
+      <text x="195" y="120" class="col-type">DECIMAL</text>
+
+      <text x="0" y="144" class="col-name">rating</text>
+      <text x="195" y="144" class="col-type">DECIMAL</text>
+
+      <rect x="-16" y="152" width="280" height="22" fill="#f8fafc"/>
+      <text x="0" y="168" class="col-name">is_active</text>
+      <text x="195" y="168" class="col-type">BOOL</text>
+
+      <text x="0" y="190" class="col-name">valid_to</text>
+      <text x="195" y="190" class="col-type">DATETIME</text>
+    </g>
+  </g>
+
+  <!-- ====================================================================== -->
+  <!-- CENTER FACTS (FACT_ORDERS & FACT_ORDER_ITEMS)                          -->
+  <!-- ====================================================================== -->
+
+  <!-- FACT_ORDERS (Grain: 1 row per order) -->
+  <g id="tbl-fact-orders" transform="translate(560, 150)">
+    <rect width="320" height="485" rx="10" class="card-fact-bg" filter="url(#schema-card-shadow)"/>
+    <path d="M 0 10 Q 0 0 10 0 L 310 0 Q 320 0 320 10 L 320 48 L 0 48 Z" fill="url(#hdr-fact-orders)"/>
+    <text x="16" y="26" class="tbl-title" font-size="16px">fact_orders</text>
+    <text x="16" y="42" class="tbl-sub">★ CENTRAL FACT · 1 Row Per Order</text>
+
+    <g transform="translate(18, 70)">
+      <!-- Primary Key -->
+      <text x="0" y="0" class="col-name-bold">order_key</text>
+      <text x="215" y="0" class="col-type">BIGINT</text>
+      <rect x="260" y="-10" width="24" height="14" rx="3" class="badge-pk-bg"/>
+      <text x="272" y="0" class="badge-pk-txt" text-anchor="middle">PK</text>
+
+      <!-- Business Key -->
+      <rect x="-18" y="10" width="320" height="24" fill="#f8fafc"/>
+      <text x="0" y="26" class="col-name">order_id</text>
+      <text x="215" y="26" class="col-type">VARCHAR</text>
+
+      <!-- Foreign Keys -->
+      <text x="0" y="52" class="col-name-bold" fill="#1e3a8a">date_key</text>
+      <text x="215" y="52" class="col-type">INT</text>
+      <rect x="260" y="42" width="24" height="14" rx="3" class="badge-fk-bg"/>
+      <text x="272" y="52" class="badge-fk-txt" text-anchor="middle">FK</text>
+
+      <rect x="-18" y="62" width="320" height="24" fill="#f8fafc"/>
+      <text x="0" y="78" class="col-name-bold" fill="#1e3a8a">customer_key</text>
+      <text x="215" y="78" class="col-type">INT</text>
+      <rect x="260" y="68" width="24" height="14" rx="3" class="badge-fk-bg"/>
+      <text x="272" y="78" class="badge-fk-txt" text-anchor="middle">FK</text>
+
+      <text x="0" y="104" class="col-name-bold" fill="#1e3a8a">restaurant_key</text>
+      <text x="215" y="104" class="col-type">INT</text>
+      <rect x="260" y="94" width="24" height="14" rx="3" class="badge-fk-bg"/>
+      <text x="272" y="104" class="badge-fk-txt" text-anchor="middle">FK</text>
+
+      <rect x="-18" y="114" width="320" height="24" fill="#f8fafc"/>
+      <text x="0" y="130" class="col-name-bold" fill="#1e3a8a">delivery_partner_key</text>
+      <text x="215" y="130" class="col-type">INT</text>
+      <rect x="260" y="120" width="24" height="14" rx="3" class="badge-fk-bg"/>
+      <text x="272" y="130" class="badge-fk-txt" text-anchor="middle">FK</text>
+
+      <text x="0" y="156" class="col-name-bold" fill="#1e3a8a">payment_method_key</text>
+      <text x="215" y="156" class="col-type">INT</text>
+      <rect x="260" y="146" width="24" height="14" rx="3" class="badge-fk-bg"/>
+      <text x="272" y="156" class="badge-fk-txt" text-anchor="middle">FK</text>
+
+      <!-- Measures & Dimensions -->
+      <rect x="-18" y="166" width="320" height="24" fill="#f8fafc"/>
+      <text x="0" y="182" class="col-name">order_datetime</text>
+      <text x="215" y="182" class="col-type">DATETIME</text>
+
+      <text x="0" y="208" class="col-name">gross_amount</text>
+      <text x="215" y="208" class="col-type">DECIMAL</text>
+
+      <rect x="-18" y="218" width="320" height="24" fill="#f8fafc"/>
+      <text x="0" y="234" class="col-name">discount</text>
+      <text x="215" y="234" class="col-type">DECIMAL</text>
+
+      <text x="0" y="260" class="col-name">delivery_fee</text>
+      <text x="215" y="260" class="col-type">DECIMAL</text>
+
+      <rect x="-18" y="270" width="320" height="24" fill="#dbeafe"/>
+      <text x="0" y="286" class="col-name-bold" fill="#1e3a8a">net_amount (Revenue)</text>
+      <text x="215" y="286" class="col-type">DECIMAL</text>
+
+      <text x="0" y="312" class="col-name">delivery_minutes</text>
+      <text x="215" y="312" class="col-type">INT</text>
+
+      <rect x="-18" y="322" width="320" height="24" fill="#f8fafc"/>
+      <text x="0" y="338" class="col-name">is_late</text>
+      <text x="215" y="338" class="col-type">BOOL</text>
+
+      <text x="0" y="364" class="col-name">rating</text>
+      <text x="215" y="364" class="col-type">DECIMAL</text>
+
+      <rect x="-18" y="374" width="320" height="24" fill="#f8fafc"/>
+      <text x="0" y="390" class="col-name">order_status</text>
+      <text x="215" y="390" class="col-type">VARCHAR</text>
+    </g>
+  </g>
+
+  <!-- FACT_ORDER_ITEMS (Grain: 1 row per item per order) -->
+  <g id="tbl-fact-order-items" transform="translate(560, 710)">
+    <rect width="320" height="250" rx="10" class="card-fact-bg" filter="url(#schema-card-shadow)"/>
+    <path d="M 0 10 Q 0 0 10 0 L 310 0 Q 320 0 320 10 L 320 48 L 0 48 Z" fill="url(#hdr-fact-items)"/>
+    <text x="16" y="26" class="tbl-title" font-size="16px">fact_order_items</text>
+    <text x="16" y="42" class="tbl-sub">LINE ITEM FACT · 1 Row Per Item Per Order</text>
+
+    <g transform="translate(18, 70)">
+      <text x="0" y="0" class="col-name-bold">order_item_key</text>
+      <text x="215" y="0" class="col-type">BIGINT</text>
+      <rect x="260" y="-10" width="24" height="14" rx="3" class="badge-pk-bg"/>
+      <text x="272" y="0" class="badge-pk-txt" text-anchor="middle">PK</text>
+
+      <rect x="-18" y="10" width="320" height="24" fill="#f8fafc"/>
+      <text x="0" y="26" class="col-name-bold" fill="#1e3a8a">order_key</text>
+      <text x="215" y="26" class="col-type">BIGINT</text>
+      <rect x="260" y="16" width="24" height="14" rx="3" class="badge-fk-bg"/>
+      <text x="272" y="26" class="badge-fk-txt" text-anchor="middle">FK</text>
+
+      <text x="0" y="52" class="col-name-bold" fill="#1e3a8a">menu_item_key</text>
+      <text x="215" y="52" class="col-type">INT</text>
+      <rect x="260" y="42" width="24" height="14" rx="3" class="badge-fk-bg"/>
+      <text x="272" y="52" class="badge-fk-txt" text-anchor="middle">FK</text>
+
+      <rect x="-18" y="62" width="320" height="24" fill="#f8fafc"/>
+      <text x="0" y="78" class="col-name">quantity</text>
+      <text x="215" y="78" class="col-type">INT</text>
+
+      <text x="0" y="104" class="col-name">unit_price</text>
+      <text x="215" y="104" class="col-type">DECIMAL</text>
+
+      <rect x="-18" y="114" width="320" height="24" fill="#dbeafe"/>
+      <text x="0" y="130" class="col-name-bold" fill="#1e3a8a">line_total (qty × price)</text>
+      <text x="215" y="130" class="col-type">DECIMAL</text>
+    </g>
+  </g>
+
+  <!-- ====================================================================== -->
+  <!-- DIMENSION TABLES (RIGHT COLUMN)                                        -->
+  <!-- ====================================================================== -->
+
+  <!-- 4. DIM_DELIVERY_PARTNER -->
+  <g id="tbl-dim-delivery-partner" transform="translate(1120, 110)">
+    <rect width="280" height="230" rx="8" class="card-bg" filter="url(#schema-card-shadow)"/>
+    <path d="M 0 8 Q 0 0 8 0 L 272 0 Q 280 0 280 8 L 280 44 L 0 44 Z" fill="url(#hdr-dim-partner)"/>
+    <text x="16" y="24" class="tbl-title">dim_delivery_partner</text>
+    <text x="16" y="38" class="tbl-sub">Fleet &amp; Riders · Upsert (SCD 1)</text>
+
+    <g transform="translate(16, 64)">
+      <text x="0" y="0" class="col-name-bold">delivery_partner_key</text>
+      <text x="195" y="0" class="col-type">INT</text>
+      <rect x="228" y="-10" width="24" height="14" rx="3" class="badge-pk-bg"/>
+      <text x="240" y="0" class="badge-pk-txt" text-anchor="middle">PK</text>
+
+      <rect x="-16" y="8" width="280" height="22" fill="#f8fafc"/>
+      <text x="0" y="24" class="col-name">partner_id</text>
+      <text x="195" y="24" class="col-type">VARCHAR</text>
+      <rect x="228" y="14" width="24" height="14" rx="3" class="badge-nk-bg"/>
+      <text x="240" y="24" class="badge-nk-txt" text-anchor="middle">NK</text>
+
+      <text x="0" y="48" class="col-name">partner_name</text>
+      <text x="195" y="48" class="col-type">VARCHAR</text>
+
+      <rect x="-16" y="56" width="280" height="22" fill="#f8fafc"/>
+      <text x="0" y="72" class="col-name">vehicle_type</text>
+      <text x="195" y="72" class="col-type">VARCHAR</text>
+
+      <text x="0" y="96" class="col-name">city</text>
+      <text x="195" y="96" class="col-type">VARCHAR</text>
+
+      <rect x="-16" y="104" width="280" height="22" fill="#f8fafc"/>
+      <text x="0" y="120" class="col-name">rating</text>
+      <text x="195" y="120" class="col-type">DECIMAL</text>
+
+      <text x="0" y="144" class="col-name">status</text>
+      <text x="195" y="144" class="col-type">VARCHAR</text>
+    </g>
+  </g>
+
+  <!-- 5. DIM_PAYMENT_METHOD -->
+  <g id="tbl-dim-payment-method" transform="translate(1120, 390)">
+    <rect width="280" height="180" rx="8" class="card-bg" filter="url(#schema-card-shadow)"/>
+    <path d="M 0 8 Q 0 0 8 0 L 272 0 Q 280 0 280 8 L 280 44 L 0 44 Z" fill="url(#hdr-dim-payment)"/>
+    <text x="16" y="24" class="tbl-title">dim_payment_method</text>
+    <text x="16" y="38" class="tbl-sub">Static Seeded Dimension</text>
+
+    <g transform="translate(16, 64)">
+      <text x="0" y="0" class="col-name-bold">payment_method_key</text>
+      <text x="195" y="0" class="col-type">INT</text>
+      <rect x="228" y="-10" width="24" height="14" rx="3" class="badge-pk-bg"/>
+      <text x="240" y="0" class="badge-pk-txt" text-anchor="middle">PK</text>
+
+      <rect x="-16" y="8" width="280" height="22" fill="#f8fafc"/>
+      <text x="0" y="24" class="col-name">payment_method_id</text>
+      <text x="195" y="24" class="col-type">VARCHAR</text>
+      <rect x="228" y="14" width="24" height="14" rx="3" class="badge-nk-bg"/>
+      <text x="240" y="24" class="badge-nk-txt" text-anchor="middle">NK</text>
+
+      <text x="0" y="48" class="col-name">method_name</text>
+      <text x="195" y="48" class="col-type">VARCHAR</text>
+
+      <rect x="-16" y="56" width="280" height="22" fill="#f8fafc"/>
+      <text x="0" y="72" class="col-name">method_category</text>
+      <text x="195" y="72" class="col-type">VARCHAR</text>
+    </g>
+  </g>
+
+  <!-- 6. DIM_MENU_ITEM -->
+  <g id="tbl-dim-menu-item" transform="translate(1120, 630)">
+    <rect width="280" height="250" rx="8" class="card-bg" filter="url(#schema-card-shadow)"/>
+    <path d="M 0 8 Q 0 0 8 0 L 272 0 Q 280 0 280 8 L 280 44 L 0 44 Z" fill="url(#hdr-dim-menu)"/>
+    <text x="16" y="24" class="tbl-title">dim_menu_item</text>
+    <text x="16" y="38" class="tbl-sub">Catalog Items · Upsert (SCD 1)</text>
+
+    <g transform="translate(16, 64)">
+      <text x="0" y="0" class="col-name-bold">menu_item_key</text>
+      <text x="195" y="0" class="col-type">INT</text>
+      <rect x="228" y="-10" width="24" height="14" rx="3" class="badge-pk-bg"/>
+      <text x="240" y="0" class="badge-pk-txt" text-anchor="middle">PK</text>
+
+      <rect x="-16" y="8" width="280" height="22" fill="#f8fafc"/>
+      <text x="0" y="24" class="col-name">item_id</text>
+      <text x="195" y="24" class="col-type">VARCHAR</text>
+      <rect x="228" y="14" width="24" height="14" rx="3" class="badge-nk-bg"/>
+      <text x="240" y="24" class="badge-nk-txt" text-anchor="middle">NK</text>
+
+      <text x="0" y="48" class="col-name">restaurant_id</text>
+      <text x="195" y="48" class="col-type">VARCHAR</text>
+
+      <rect x="-16" y="56" width="280" height="22" fill="#f8fafc"/>
+      <text x="0" y="72" class="col-name">item_name</text>
+      <text x="195" y="72" class="col-type">VARCHAR</text>
+
+      <text x="0" y="96" class="col-name">category</text>
+      <text x="195" y="96" class="col-type">VARCHAR</text>
+
+      <rect x="-16" y="104" width="280" height="22" fill="#f8fafc"/>
+      <text x="0" y="120" class="col-name">is_veg</text>
+      <text x="195" y="120" class="col-type">BOOL</text>
+
+      <text x="0" y="144" class="col-name">base_price</text>
+      <text x="195" y="144" class="col-type">DECIMAL</text>
+
+      <rect x="-16" y="152" width="280" height="22" fill="#f8fafc"/>
+      <text x="0" y="168" class="col-name">is_available</text>
+      <text x="195" y="168" class="col-type">BOOL</text>
+    </g>
+  </g>
+
+</svg>

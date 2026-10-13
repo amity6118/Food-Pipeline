@@ -12,3 +12,7 @@ Dockerfile* text eol=lf
 *.json text eol=lf
 *.csv text eol=lf
 *.md text eol=lf
+
+# Diagrams
+*.svg text eol=lf
+*.png binary

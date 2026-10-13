@@ -1,4 +1,11 @@
+# Food Order ETL Pipeline: local stack for Docker Desktop.
+# All credentials come from .env (copy .env.example to .env first).
+
+name: food-order-pipeline
+
 services:
+  # MySQL 8 hosts the staging, control and warehouse databases.
+  # Scripts in ./sql/init run once, on first boot of an empty volume.
   mysql:
     image: mysql:8.0
     container_name: food_order_mysql
@@ -6,8 +13,9 @@ services:
     ports:
       - "${HOST_MYSQL_PORT:-3306}:3306"
     environment:
+      TZ: ${PIPELINE_TIMEZONE:-Asia/Kolkata}
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?Set MYSQL_ROOT_PASSWORD in .env}
-      MYSQL_DATABASE: ${CONTROL_DB:-food_control}
+      MYSQL_DATABASE: food_control
       MYSQL_USER: ${MYSQL_USER:?Set MYSQL_USER in .env}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD:?Set MYSQL_PASSWORD in .env}
       POWERBI_USER: ${POWERBI_USER:?Set POWERBI_USER in .env}
@@ -15,6 +23,8 @@ services:
     volumes:
       - mysql_data:/var/lib/mysql
       - ./sql/init:/docker-entrypoint-initdb.d:ro
+    # mysql_native_password keeps Power BI's MySQL connector compatible;
+    # log-bin-trust-function-creators allows stored routines with binary logging on.
     command: >
       --default-authentication-plugin=mysql_native_password
       --character-set-server=utf8mb4
@@ -22,14 +32,17 @@ services:
       --sql_mode=STRICT_TRANS_TABLES,NO_ENGINE_SUBSTITUTION
       --log-bin-trust-function-creators=1
     healthcheck:
-      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -u root -p$${MYSQL_ROOT_PASSWORD}"]
+      # The temporary init server runs without networking, so this only passes
+      # once init scripts have finished and the real server is listening.
+      test: ["CMD-SHELL", "MYSQL_PWD=\"$$MYSQL_ROOT_PASSWORD\" mysqladmin ping -h 127.0.0.1 -uroot --silent"]
       interval: 10s
       timeout: 5s
-      retries: 6
-      start_period: 25s
+      retries: 12
+      start_period: 30s
     networks:
       - pipeline_net
 
+  # Mock source system: serves simulated orders as JSON over HTTP.
   mock_api:
     build:
       context: .
@@ -39,13 +52,12 @@ services:
     ports:
       - "${HOST_MOCK_API_PORT:-8000}:8000"
     environment:
-      - MOCK_API_HOST=0.0.0.0
-      - MOCK_API_PORT=8000
+      TZ: ${PIPELINE_TIMEZONE:-Asia/Kolkata}
     volumes:
       - ./src:/app/src:ro
       - ./data:/app/data
     healthcheck:
-      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health')\""]
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=3)"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -53,6 +65,7 @@ services:
     networks:
       - pipeline_net
 
+  # ETL worker: ingestion, DQ checks, stored-procedure calls and scheduling.
   etl:
     build:
       context: .
@@ -67,28 +80,27 @@ services:
     env_file:
       - .env
     environment:
-      - MYSQL_HOST=mysql
-      - MYSQL_PORT=3306
-      - MOCK_API_BASE_URL=http://mock_api:8000
-      - PYTHONUNBUFFERED=1
+      # Container-network addresses override the host-oriented values in .env
+      TZ: ${PIPELINE_TIMEZONE:-Asia/Kolkata}
+      MYSQL_HOST: mysql
+      MYSQL_PORT: "3306"
+      MOCK_API_BASE_URL: http://mock_api:8000
     volumes:
-      - ./data:/app/data
-      - ./logs:/app/logs
-      - ./src:/app/src
-      - ./sql:/app/sql
-      - ./tests:/app/tests
-      - ./run_pipeline.py:/app/run_pipeline.py
-    entrypoint: ["/app/docker/etl/entrypoint.sh"]
-    command: ["python", "run_pipeline.py", "--step", "all"]
+      # Live-mount the project so code changes need no image rebuild
+      - .:/app
+    command: ["python", "-m", "src.utils.healthcheck"]
     networks:
       - pipeline_net
 
+  # Browser UI for inspecting the databases at http://localhost:8080
   adminer:
-    image: adminer:latest
+    image: adminer:4.8.1
     container_name: food_order_adminer
     restart: unless-stopped
     ports:
       - "${HOST_ADMINER_PORT:-8080}:8080"
+    environment:
+      ADMINER_DEFAULT_SERVER: mysql
     depends_on:
       mysql:
         condition: service_healthy
@@ -97,7 +109,6 @@ services:
 
 volumes:
   mysql_data:
-    driver: local
 
 networks:
   pipeline_net:

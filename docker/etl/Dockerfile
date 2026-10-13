@@ -1,32 +1,30 @@
-FROM python:3.11-slim-bullseye
+# ETL worker image: Python 3.11 runtime for ingestion, DQ checks and orchestration.
+FROM python:3.11-slim-bookworm
 
-# Set environment variables
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
-    DEBIAN_FRONTEND=noninteractive \
-    TZ=Asia/Kolkata
+    PIP_NO_CACHE_DIR=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1
 
-# Install system dependencies (curl and default-mysql-client for connectivity testing)
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    curl \
-    default-mysql-client \
-    tzdata \
+# tzdata lets logs and the scheduler honour PIPELINE_TIMEZONE (e.g. Asia/Kolkata)
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends tzdata \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
-# Install Python requirements
+# Dependencies first, so code edits don't invalidate this cached layer
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install -r requirements.txt
 
-# Create necessary directories
-RUN mkdir -p /app/data/landing /app/data/archive /app/data/error /app/logs
-
-# Copy project files
 COPY . .
 
-# Set execution permissions on entrypoint script
-RUN chmod +x /app/docker/etl/entrypoint.sh
+# Run as an unprivileged user
+RUN useradd --create-home --uid 1000 etl \
+    && mkdir -p data/landing data/archive data/error logs \
+    && chown -R etl:etl /app
+USER etl
 
-ENTRYPOINT ["/app/docker/etl/entrypoint.sh"]
-CMD ["python", "run_pipeline.py", "--step", "all"]
+# Invoked through bash so the script works even if a Windows checkout drops the exec bit
+ENTRYPOINT ["bash", "/app/docker/etl/entrypoint.sh"]
+CMD ["python", "-m", "src.utils.healthcheck"]

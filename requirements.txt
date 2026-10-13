@@ -1,22 +1,21 @@
-# Core Data Ingestion & Transformation
-pandas>=2.2.0
-SQLAlchemy>=2.0.28
-PyMySQL>=1.1.0
-cryptography>=42.0.5
+# Exact pins keep builds reproducible. Faker in particular must stay pinned:
+# seeded output can change between Faker releases.
 
-# Synthetic Data Generation
-Faker>=24.0.0
+# Data handling & database access
+pandas==2.2.3
+SQLAlchemy==2.0.36
+PyMySQL==1.1.1
 
-# Mock API Server & Client
-fastapi>=0.110.0
-uvicorn>=0.29.0
-requests>=2.31.0
-pydantic>=2.6.4
+# Synthetic data generation
+Faker==30.8.2
 
-# Orchestration & Environment Configuration
-python-dotenv>=1.0.1
-APScheduler>=3.10.4
+# Mock orders API
+fastapi==0.115.5
+uvicorn==0.32.1
 
-# Testing & Quality Assurance
-pytest>=8.1.1
-pytest-mock>=3.14.0
+# Configuration & scheduling
+python-dotenv==1.0.1
+APScheduler==3.10.4
+
+# Testing
+pytest==8.3.3
