@@ -1,47 +1,88 @@
-"""Structured logging module for the Food Order ETL pipeline."""
+"""Structured logging: readable lines on the console, JSON lines in logs/etl_pipeline.log.
 
+Every record carries the current run context (batch_id, step), set with
+`log_context(...)`, so a whole run can be filtered from the JSON log:
+
+    with log_context(batch_id="B20261012", step="ingest"):
+        logger.info("Loaded %d rows", n)
+"""
+
+import json
 import logging
 import sys
-from pathlib import Path
+from collections.abc import Iterator
+from contextlib import contextmanager
+from contextvars import ContextVar
+from datetime import datetime
+from logging.handlers import RotatingFileHandler
+
 from src.config import LOG_DIR, LOG_LEVEL
 
+LOG_FILE = LOG_DIR / "etl_pipeline.log"
+_ROOT_LOGGER = "src"
+_context: ContextVar[dict[str, str]] = ContextVar("log_context", default={})
+
+
+class _ContextFilter(logging.Filter):
+    """Copies the current run context onto each record."""
+
+    def filter(self, record: logging.LogRecord) -> bool:
+        context = _context.get()
+        record.batch_id = context.get("batch_id", "-")
+        record.step = context.get("step", "-")
+        return True
+
+
+class _JsonFormatter(logging.Formatter):
+    """One JSON object per line, ready for log tooling or ad-hoc jq/pandas analysis."""
+
+    def format(self, record: logging.LogRecord) -> str:
+        payload = {
+            "timestamp": datetime.fromtimestamp(record.created).isoformat(timespec="milliseconds"),
+            "level": record.levelname,
+            "logger": record.name,
+            "batch_id": record.batch_id,
+            "step": record.step,
+            "message": record.getMessage(),
+        }
+        if record.exc_info:
+            payload["exception"] = self.formatException(record.exc_info)
+        return json.dumps(payload, ensure_ascii=False)
+
+
+def _configure_root() -> logging.Logger:
+    root = logging.getLogger(_ROOT_LOGGER)
+    if root.handlers:
+        return root
+    root.setLevel(getattr(logging, LOG_LEVEL.upper(), logging.INFO))
+    root.propagate = False
+    context_filter = _ContextFilter()
+
+    console = logging.StreamHandler(sys.stdout)
+    console.setFormatter(logging.Formatter(
+        "[%(asctime)s] [%(levelname)s] [%(name)s] [%(batch_id)s]: %(message)s", datefmt="%Y-%m-%d %H:%M:%S"))
+    console.addFilter(context_filter)
+    root.addHandler(console)
+
+    LOG_DIR.mkdir(parents=True, exist_ok=True)
+    file_handler = RotatingFileHandler(LOG_FILE, maxBytes=5_000_000, backupCount=5, encoding="utf-8")
+    file_handler.setFormatter(_JsonFormatter())
+    file_handler.addFilter(context_filter)
+    root.addHandler(file_handler)
+    return root
+
+
 def get_logger(name: str) -> logging.Logger:
-    """Returns a pre-configured logger with console and rotating file output.
-    
-    Args:
-        name: Name of the module/component requesting the logger.
-        
-    Returns:
-        logging.Logger instance configured with standardized formats.
-    """
-    logger = logging.getLogger(name)
-    if logger.handlers:
-        return logger
+    """Logger for a module under the shared `src` configuration (pass a `src.*` name)."""
+    _configure_root()
+    return logging.getLogger(name)
 
-    numeric_level = getattr(logging, LOG_LEVEL.upper(), logging.INFO)
-    logger.setLevel(numeric_level)
 
-    # Formatter with timestamp, level, module and message
-    formatter = logging.Formatter(
-        fmt="[%(asctime)s] [%(levelname)s] [%(name)s]: %(message)s",
-        datefmt="%Y-%m-%d %H:%M:%S"
-    )
-
-    # Console Handler
-    console_handler = logging.StreamHandler(sys.stdout)
-    console_handler.setFormatter(formatter)
-    logger.addHandler(console_handler)
-
-    # File Handler
-    log_file_path = LOG_DIR / "etl_pipeline.log"
+@contextmanager
+def log_context(**values: str) -> Iterator[None]:
+    """Attach key/value context (e.g. batch_id, step) to every log record in the block."""
+    token = _context.set({**_context.get(), **values})
     try:
-        file_handler = logging.FileHandler(log_file_path, encoding="utf-8")
-        file_handler.setFormatter(formatter)
-        logger.addHandler(file_handler)
-    except Exception as exc:
-        # Fallback to console only if file cannot be opened
-        console_handler.setLevel(numeric_level)
-        logger.warning(f"Failed to initialize file logger at {log_file_path}: {exc}")
-
-    logger.propagate = False
-    return logger
+        yield
+    finally:
+        _context.reset(token)
