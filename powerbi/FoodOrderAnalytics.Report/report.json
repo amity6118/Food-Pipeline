@@ -1,0 +1,336 @@
+{
+  "config": "{\"version\": \"5.43\", \"themeCollection\": {}, \"activeSectionIndex\": 0, \"defaultDrillFilterOtherVisuals\": true}",
+  "layoutOptimization": 0,
+  "sections": [
+    {
+      "name": "ReportSection0",
+      "displayName": "Executive Overview",
+      "displayOption": 1,
+      "ordinal": 0,
+      "width": 1280,
+      "height": 720,
+      "config": "{}",
+      "filters": "[]",
+      "visualContainers": [
+        {
+          "x": 20,
+          "y": 20,
+          "z": 0,
+          "width": 198,
+          "height": 110,
+          "config": "{\"name\": \"cca23abcbe304ab6ad42\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 20, \"y\": 20, \"z\": 0, \"width\": 198, \"height\": 110}}], \"singleVisual\": {\"visualType\": \"card\", \"projections\": {\"Values\": [{\"queryRef\": \"fact_orders.Total Orders\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"t0\", \"Entity\": \"fact_orders\", \"Type\": 0}], \"Select\": [{\"Measure\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"Total Orders\"}, \"Name\": \"fact_orders.Total Orders\"}]}, \"drillFilterOtherVisuals\": true, \"vcObjects\": {\"title\": [{\"properties\": {\"show\": {\"expr\": {\"Literal\": {\"Value\": \"true\"}}}, \"text\": {\"expr\": {\"Literal\": {\"Value\": \"'Total Orders'\"}}}}}]}}}",
+          "filters": "[]"
+        },
+        {
+          "x": 228,
+          "y": 20,
+          "z": 0,
+          "width": 198,
+          "height": 110,
+          "config": "{\"name\": \"dd4d0d93c4bc44b195b3\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 228, \"y\": 20, \"z\": 0, \"width\": 198, \"height\": 110}}], \"singleVisual\": {\"visualType\": \"card\", \"projections\": {\"Values\": [{\"queryRef\": \"fact_orders.GMV\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"t0\", \"Entity\": \"fact_orders\", \"Type\": 0}], \"Select\": [{\"Measure\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"GMV\"}, \"Name\": \"fact_orders.GMV\"}]}, \"drillFilterOtherVisuals\": true, \"vcObjects\": {\"title\": [{\"properties\": {\"show\": {\"expr\": {\"Literal\": {\"Value\": \"true\"}}}, \"text\": {\"expr\": {\"Literal\": {\"Value\": \"'GMV'\"}}}}}]}}}",
+          "filters": "[]"
+        },
+        {
+          "x": 436,
+          "y": 20,
+          "z": 0,
+          "width": 198,
+          "height": 110,
+          "config": "{\"name\": \"d8fff1bd6efb45e3ac25\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 436, \"y\": 20, \"z\": 0, \"width\": 198, \"height\": 110}}], \"singleVisual\": {\"visualType\": \"card\", \"projections\": {\"Values\": [{\"queryRef\": \"fact_orders.AOV\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"t0\", \"Entity\": \"fact_orders\", \"Type\": 0}], \"Select\": [{\"Measure\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"AOV\"}, \"Name\": \"fact_orders.AOV\"}]}, \"drillFilterOtherVisuals\": true, \"vcObjects\": {\"title\": [{\"properties\": {\"show\": {\"expr\": {\"Literal\": {\"Value\": \"true\"}}}, \"text\": {\"expr\": {\"Literal\": {\"Value\": \"'AOV'\"}}}}}]}}}",
+          "filters": "[]"
+        },
+        {
+          "x": 644,
+          "y": 20,
+          "z": 0,
+          "width": 198,
+          "height": 110,
+          "config": "{\"name\": \"fa83a9e4afa543a1b9fc\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 644, \"y\": 20, \"z\": 0, \"width\": 198, \"height\": 110}}], \"singleVisual\": {\"visualType\": \"card\", \"projections\": {\"Values\": [{\"queryRef\": \"fact_orders.Cancellation Rate\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"t0\", \"Entity\": \"fact_orders\", \"Type\": 0}], \"Select\": [{\"Measure\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"Cancellation Rate\"}, \"Name\": \"fact_orders.Cancellation Rate\"}]}, \"drillFilterOtherVisuals\": true, \"vcObjects\": {\"title\": [{\"properties\": {\"show\": {\"expr\": {\"Literal\": {\"Value\": \"true\"}}}, \"text\": {\"expr\": {\"Literal\": {\"Value\": \"'Cancellation Rate'\"}}}}}]}}}",
+          "filters": "[]"
+        },
+        {
+          "x": 852,
+          "y": 20,
+          "z": 0,
+          "width": 198,
+          "height": 110,
+          "config": "{\"name\": \"2ac318fd54164c5f9bb2\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 852, \"y\": 20, \"z\": 0, \"width\": 198, \"height\": 110}}], \"singleVisual\": {\"visualType\": \"card\", \"projections\": {\"Values\": [{\"queryRef\": \"fact_orders.On-Time %\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"t0\", \"Entity\": \"fact_orders\", \"Type\": 0}], \"Select\": [{\"Measure\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"On-Time %\"}, \"Name\": \"fact_orders.On-Time %\"}]}, \"drillFilterOtherVisuals\": true, \"vcObjects\": {\"title\": [{\"properties\": {\"show\": {\"expr\": {\"Literal\": {\"Value\": \"true\"}}}, \"text\": {\"expr\": {\"Literal\": {\"Value\": \"'On-Time %'\"}}}}}]}}}",
+          "filters": "[]"
+        },
+        {
+          "x": 1060,
+          "y": 20,
+          "z": 0,
+          "width": 198,
+          "height": 110,
+          "config": "{\"name\": \"3a2a6b882afa474fbc10\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 1060, \"y\": 20, \"z\": 0, \"width\": 198, \"height\": 110}}], \"singleVisual\": {\"visualType\": \"card\", \"projections\": {\"Values\": [{\"queryRef\": \"fact_orders.Avg Rating\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"t0\", \"Entity\": \"fact_orders\", \"Type\": 0}], \"Select\": [{\"Measure\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"Avg Rating\"}, \"Name\": \"fact_orders.Avg Rating\"}]}, \"drillFilterOtherVisuals\": true, \"vcObjects\": {\"title\": [{\"properties\": {\"show\": {\"expr\": {\"Literal\": {\"Value\": \"true\"}}}, \"text\": {\"expr\": {\"Literal\": {\"Value\": \"'Avg Rating'\"}}}}}]}}}",
+          "filters": "[]"
+        },
+        {
+          "x": 20,
+          "y": 145,
+          "z": 0,
+          "width": 800,
+          "height": 555,
+          "config": "{\"name\": \"c11b34f7fd2448e1bdf0\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 20, \"y\": 145, \"z\": 0, \"width\": 800, \"height\": 555}}], \"singleVisual\": {\"visualType\": \"lineChart\", \"projections\": {\"Category\": [{\"queryRef\": \"dim_date.full_date\"}], \"Y\": [{\"queryRef\": \"fact_orders.GMV\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"t0\", \"Entity\": \"dim_date\", \"Type\": 0}, {\"Name\": \"t1\", \"Entity\": \"fact_orders\", \"Type\": 0}], \"Select\": [{\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"full_date\"}, \"Name\": \"dim_date.full_date\"}, {\"Measure\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t1\"}}, \"Property\": \"GMV\"}, \"Name\": \"fact_orders.GMV\"}]}, \"drillFilterOtherVisuals\": true, \"vcObjects\": {\"title\": [{\"properties\": {\"show\": {\"expr\": {\"Literal\": {\"Value\": \"true\"}}}, \"text\": {\"expr\": {\"Literal\": {\"Value\": \"'Daily GMV'\"}}}}}]}}}",
+          "filters": "[]"
+        },
+        {
+          "x": 830,
+          "y": 145,
+          "z": 0,
+          "width": 430,
+          "height": 555,
+          "config": "{\"name\": \"0fe23bd724094f8fae74\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 830, \"y\": 145, \"z\": 0, \"width\": 430, \"height\": 555}}], \"singleVisual\": {\"visualType\": \"clusteredBarChart\", \"projections\": {\"Category\": [{\"queryRef\": \"dim_customer.city\"}], \"Y\": [{\"queryRef\": \"fact_orders.Total Orders\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"t0\", \"Entity\": \"dim_customer\", \"Type\": 0}, {\"Name\": \"t1\", \"Entity\": \"fact_orders\", \"Type\": 0}], \"Select\": [{\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"city\"}, \"Name\": \"dim_customer.city\"}, {\"Measure\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t1\"}}, \"Property\": \"Total Orders\"}, \"Name\": \"fact_orders.Total Orders\"}]}, \"drillFilterOtherVisuals\": true, \"vcObjects\": {\"title\": [{\"properties\": {\"show\": {\"expr\": {\"Literal\": {\"Value\": \"true\"}}}, \"text\": {\"expr\": {\"Literal\": {\"Value\": \"'Orders by city'\"}}}}}]}}}",
+          "filters": "[]"
+        }
+      ]
+    },
+    {
+      "name": "ReportSection1",
+      "displayName": "Sales",
+      "displayOption": 1,
+      "ordinal": 1,
+      "width": 1280,
+      "height": 720,
+      "config": "{}",
+      "filters": "[]",
+      "visualContainers": [
+        {
+          "x": 20,
+          "y": 20,
+          "z": 0,
+          "width": 620,
+          "height": 330,
+          "config": "{\"name\": \"36999dcb27fb4f0da3a0\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 20, \"y\": 20, \"z\": 0, \"width\": 620, \"height\": 330}}], \"singleVisual\": {\"visualType\": \"clusteredColumnChart\", \"projections\": {\"Category\": [{\"queryRef\": \"dim_date.month_label\"}], \"Y\": [{\"queryRef\": \"fact_orders.GMV\"}, {\"queryRef\": \"fact_orders.Net Revenue\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"t0\", \"Entity\": \"dim_date\", \"Type\": 0}, {\"Name\": \"t1\", \"Entity\": \"fact_orders\", \"Type\": 0}], \"Select\": [{\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"month_label\"}, \"Name\": \"dim_date.month_label\"}, {\"Measure\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t1\"}}, \"Property\": \"GMV\"}, \"Name\": \"fact_orders.GMV\"}, {\"Measure\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t1\"}}, \"Property\": \"Net Revenue\"}, \"Name\": \"fact_orders.Net Revenue\"}]}, \"drillFilterOtherVisuals\": true, \"vcObjects\": {\"title\": [{\"properties\": {\"show\": {\"expr\": {\"Literal\": {\"Value\": \"true\"}}}, \"text\": {\"expr\": {\"Literal\": {\"Value\": \"'GMV and net revenue by month'\"}}}}}]}}}",
+          "filters": "[]"
+        },
+        {
+          "x": 650,
+          "y": 20,
+          "z": 0,
+          "width": 610,
+          "height": 330,
+          "config": "{\"name\": \"08b777ab4aca4f628b79\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 650, \"y\": 20, \"z\": 0, \"width\": 610, \"height\": 330}}], \"singleVisual\": {\"visualType\": \"donutChart\", \"projections\": {\"Category\": [{\"queryRef\": \"dim_payment_method.method_name\"}], \"Y\": [{\"queryRef\": \"fact_orders.Total Orders\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"t0\", \"Entity\": \"dim_payment_method\", \"Type\": 0}, {\"Name\": \"t1\", \"Entity\": \"fact_orders\", \"Type\": 0}], \"Select\": [{\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"method_name\"}, \"Name\": \"dim_payment_method.method_name\"}, {\"Measure\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t1\"}}, \"Property\": \"Total Orders\"}, \"Name\": \"fact_orders.Total Orders\"}]}, \"drillFilterOtherVisuals\": true, \"vcObjects\": {\"title\": [{\"properties\": {\"show\": {\"expr\": {\"Literal\": {\"Value\": \"true\"}}}, \"text\": {\"expr\": {\"Literal\": {\"Value\": \"'Payment method mix'\"}}}}}]}}}",
+          "filters": "[]"
+        },
+        {
+          "x": 20,
+          "y": 360,
+          "z": 0,
+          "width": 820,
+          "height": 340,
+          "config": "{\"name\": \"55d871966388450087fb\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 20, \"y\": 360, \"z\": 0, \"width\": 820, \"height\": 340}}], \"singleVisual\": {\"visualType\": \"pivotTable\", \"projections\": {\"Rows\": [{\"queryRef\": \"dim_date.day_name\"}], \"Columns\": [{\"queryRef\": \"fact_orders.order_hour\"}], \"Values\": [{\"queryRef\": \"fact_orders.Total Orders\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"t0\", \"Entity\": \"dim_date\", \"Type\": 0}, {\"Name\": \"t1\", \"Entity\": \"fact_orders\", \"Type\": 0}], \"Select\": [{\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"day_name\"}, \"Name\": \"dim_date.day_name\"}, {\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t1\"}}, \"Property\": \"order_hour\"}, \"Name\": \"fact_orders.order_hour\"}, {\"Measure\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t1\"}}, \"Property\": \"Total Orders\"}, \"Name\": \"fact_orders.Total Orders\"}]}, \"drillFilterOtherVisuals\": true, \"vcObjects\": {\"title\": [{\"properties\": {\"show\": {\"expr\": {\"Literal\": {\"Value\": \"true\"}}}, \"text\": {\"expr\": {\"Literal\": {\"Value\": \"'Orders by weekday and hour (lunch / dinner peaks)'\"}}}}}]}}}",
+          "filters": "[]"
+        },
+        {
+          "x": 850,
+          "y": 360,
+          "z": 0,
+          "width": 410,
+          "height": 340,
+          "config": "{\"name\": \"1f816ae3a8974a8683e5\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 850, \"y\": 360, \"z\": 0, \"width\": 410, \"height\": 340}}], \"singleVisual\": {\"visualType\": \"clusteredColumnChart\", \"projections\": {\"Category\": [{\"queryRef\": \"dim_date.is_weekend\"}], \"Y\": [{\"queryRef\": \"fact_orders.Total Orders\"}, {\"queryRef\": \"fact_orders.AOV\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"t0\", \"Entity\": \"dim_date\", \"Type\": 0}, {\"Name\": \"t1\", \"Entity\": \"fact_orders\", \"Type\": 0}], \"Select\": [{\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"is_weekend\"}, \"Name\": \"dim_date.is_weekend\"}, {\"Measure\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t1\"}}, \"Property\": \"Total Orders\"}, \"Name\": \"fact_orders.Total Orders\"}, {\"Measure\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t1\"}}, \"Property\": \"AOV\"}, \"Name\": \"fact_orders.AOV\"}]}, \"drillFilterOtherVisuals\": true, \"vcObjects\": {\"title\": [{\"properties\": {\"show\": {\"expr\": {\"Literal\": {\"Value\": \"true\"}}}, \"text\": {\"expr\": {\"Literal\": {\"Value\": \"'Weekday (0) vs weekend (1)'\"}}}}}]}}}",
+          "filters": "[]"
+        }
+      ]
+    },
+    {
+      "name": "ReportSection2",
+      "displayName": "Customers",
+      "displayOption": 1,
+      "ordinal": 2,
+      "width": 1280,
+      "height": 720,
+      "config": "{}",
+      "filters": "[]",
+      "visualContainers": [
+        {
+          "x": 20,
+          "y": 20,
+          "z": 0,
+          "width": 302,
+          "height": 110,
+          "config": "{\"name\": \"c90b263263994d4099af\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 20, \"y\": 20, \"z\": 0, \"width\": 302, \"height\": 110}}], \"singleVisual\": {\"visualType\": \"card\", \"projections\": {\"Values\": [{\"queryRef\": \"fact_orders.Repeat Customer %\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"t0\", \"Entity\": \"fact_orders\", \"Type\": 0}], \"Select\": [{\"Measure\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"Repeat Customer %\"}, \"Name\": \"fact_orders.Repeat Customer %\"}]}, \"drillFilterOtherVisuals\": true, \"vcObjects\": {\"title\": [{\"properties\": {\"show\": {\"expr\": {\"Literal\": {\"Value\": \"true\"}}}, \"text\": {\"expr\": {\"Literal\": {\"Value\": \"'Repeat Customer %'\"}}}}}]}}}",
+          "filters": "[]"
+        },
+        {
+          "x": 332,
+          "y": 20,
+          "z": 0,
+          "width": 302,
+          "height": 110,
+          "config": "{\"name\": \"f5791c68fa3e4ca398b3\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 332, \"y\": 20, \"z\": 0, \"width\": 302, \"height\": 110}}], \"singleVisual\": {\"visualType\": \"card\", \"projections\": {\"Values\": [{\"queryRef\": \"fact_orders.Total Orders\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"t0\", \"Entity\": \"fact_orders\", \"Type\": 0}], \"Select\": [{\"Measure\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"Total Orders\"}, \"Name\": \"fact_orders.Total Orders\"}]}, \"drillFilterOtherVisuals\": true, \"vcObjects\": {\"title\": [{\"properties\": {\"show\": {\"expr\": {\"Literal\": {\"Value\": \"true\"}}}, \"text\": {\"expr\": {\"Literal\": {\"Value\": \"'Total Orders'\"}}}}}]}}}",
+          "filters": "[]"
+        },
+        {
+          "x": 644,
+          "y": 20,
+          "z": 0,
+          "width": 302,
+          "height": 110,
+          "config": "{\"name\": \"893632f61c804f6f9bab\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 644, \"y\": 20, \"z\": 0, \"width\": 302, \"height\": 110}}], \"singleVisual\": {\"visualType\": \"card\", \"projections\": {\"Values\": [{\"queryRef\": \"fact_orders.AOV\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"t0\", \"Entity\": \"fact_orders\", \"Type\": 0}], \"Select\": [{\"Measure\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"AOV\"}, \"Name\": \"fact_orders.AOV\"}]}, \"drillFilterOtherVisuals\": true, \"vcObjects\": {\"title\": [{\"properties\": {\"show\": {\"expr\": {\"Literal\": {\"Value\": \"true\"}}}, \"text\": {\"expr\": {\"Literal\": {\"Value\": \"'AOV'\"}}}}}]}}}",
+          "filters": "[]"
+        },
+        {
+          "x": 956,
+          "y": 20,
+          "z": 0,
+          "width": 302,
+          "height": 110,
+          "config": "{\"name\": \"df46d8ebb79545f095b9\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 956, \"y\": 20, \"z\": 0, \"width\": 302, \"height\": 110}}], \"singleVisual\": {\"visualType\": \"card\", \"projections\": {\"Values\": [{\"queryRef\": \"fact_orders.Avg Rating\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"t0\", \"Entity\": \"fact_orders\", \"Type\": 0}], \"Select\": [{\"Measure\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"Avg Rating\"}, \"Name\": \"fact_orders.Avg Rating\"}]}, \"drillFilterOtherVisuals\": true, \"vcObjects\": {\"title\": [{\"properties\": {\"show\": {\"expr\": {\"Literal\": {\"Value\": \"true\"}}}, \"text\": {\"expr\": {\"Literal\": {\"Value\": \"'Avg Rating'\"}}}}}]}}}",
+          "filters": "[]"
+        },
+        {
+          "x": 20,
+          "y": 145,
+          "z": 0,
+          "width": 500,
+          "height": 555,
+          "config": "{\"name\": \"504c4a46be0b4ab190ce\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 20, \"y\": 145, \"z\": 0, \"width\": 500, \"height\": 555}}], \"singleVisual\": {\"visualType\": \"clusteredBarChart\", \"projections\": {\"Category\": [{\"queryRef\": \"dim_customer.state\"}], \"Y\": [{\"queryRef\": \"fact_orders.Total Orders\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"t0\", \"Entity\": \"dim_customer\", \"Type\": 0}, {\"Name\": \"t1\", \"Entity\": \"fact_orders\", \"Type\": 0}], \"Select\": [{\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"state\"}, \"Name\": \"dim_customer.state\"}, {\"Measure\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t1\"}}, \"Property\": \"Total Orders\"}, \"Name\": \"fact_orders.Total Orders\"}]}, \"drillFilterOtherVisuals\": true, \"vcObjects\": {\"title\": [{\"properties\": {\"show\": {\"expr\": {\"Literal\": {\"Value\": \"true\"}}}, \"text\": {\"expr\": {\"Literal\": {\"Value\": \"'Orders by state'\"}}}}}]}}}",
+          "filters": "[]"
+        },
+        {
+          "x": 530,
+          "y": 145,
+          "z": 0,
+          "width": 730,
+          "height": 555,
+          "config": "{\"name\": \"b407fb0f789f47888df8\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 530, \"y\": 145, \"z\": 0, \"width\": 730, \"height\": 555}}], \"singleVisual\": {\"visualType\": \"tableEx\", \"projections\": {\"Values\": [{\"queryRef\": \"dim_customer.customer_name\"}, {\"queryRef\": \"dim_customer.city\"}, {\"queryRef\": \"fact_orders.Total Orders\"}, {\"queryRef\": \"fact_orders.GMV\"}, {\"queryRef\": \"fact_orders.Avg Rating\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"t0\", \"Entity\": \"dim_customer\", \"Type\": 0}, {\"Name\": \"t1\", \"Entity\": \"fact_orders\", \"Type\": 0}], \"Select\": [{\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"customer_name\"}, \"Name\": \"dim_customer.customer_name\"}, {\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"city\"}, \"Name\": \"dim_customer.city\"}, {\"Measure\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t1\"}}, \"Property\": \"Total Orders\"}, \"Name\": \"fact_orders.Total Orders\"}, {\"Measure\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t1\"}}, \"Property\": \"GMV\"}, \"Name\": \"fact_orders.GMV\"}, {\"Measure\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t1\"}}, \"Property\": \"Avg Rating\"}, \"Name\": \"fact_orders.Avg Rating\"}]}, \"drillFilterOtherVisuals\": true, \"vcObjects\": {\"title\": [{\"properties\": {\"show\": {\"expr\": {\"Literal\": {\"Value\": \"true\"}}}, \"text\": {\"expr\": {\"Literal\": {\"Value\": \"'Customers'\"}}}}}]}}}",
+          "filters": "[]"
+        }
+      ]
+    },
+    {
+      "name": "ReportSection3",
+      "displayName": "Restaurants",
+      "displayOption": 1,
+      "ordinal": 3,
+      "width": 1280,
+      "height": 720,
+      "config": "{}",
+      "filters": "[]",
+      "visualContainers": [
+        {
+          "x": 20,
+          "y": 20,
+          "z": 0,
+          "width": 500,
+          "height": 330,
+          "config": "{\"name\": \"6d96b0eff78f4de980be\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 20, \"y\": 20, \"z\": 0, \"width\": 500, \"height\": 330}}], \"singleVisual\": {\"visualType\": \"clusteredBarChart\", \"projections\": {\"Category\": [{\"queryRef\": \"dim_restaurant.cuisine_type\"}], \"Y\": [{\"queryRef\": \"fact_orders.GMV\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"t0\", \"Entity\": \"dim_restaurant\", \"Type\": 0}, {\"Name\": \"t1\", \"Entity\": \"fact_orders\", \"Type\": 0}], \"Select\": [{\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"cuisine_type\"}, \"Name\": \"dim_restaurant.cuisine_type\"}, {\"Measure\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t1\"}}, \"Property\": \"GMV\"}, \"Name\": \"fact_orders.GMV\"}]}, \"drillFilterOtherVisuals\": true, \"vcObjects\": {\"title\": [{\"properties\": {\"show\": {\"expr\": {\"Literal\": {\"Value\": \"true\"}}}, \"text\": {\"expr\": {\"Literal\": {\"Value\": \"'GMV by cuisine'\"}}}}}]}}}",
+          "filters": "[]"
+        },
+        {
+          "x": 530,
+          "y": 20,
+          "z": 0,
+          "width": 730,
+          "height": 330,
+          "config": "{\"name\": \"e8ea48f56e5147adb9a9\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 530, \"y\": 20, \"z\": 0, \"width\": 730, \"height\": 330}}], \"singleVisual\": {\"visualType\": \"clusteredBarChart\", \"projections\": {\"Category\": [{\"queryRef\": \"dim_menu_item.item_name\"}], \"Y\": [{\"queryRef\": \"fact_order_items.Items Sold\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"t0\", \"Entity\": \"dim_menu_item\", \"Type\": 0}, {\"Name\": \"t1\", \"Entity\": \"fact_order_items\", \"Type\": 0}], \"Select\": [{\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"item_name\"}, \"Name\": \"dim_menu_item.item_name\"}, {\"Measure\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t1\"}}, \"Property\": \"Items Sold\"}, \"Name\": \"fact_order_items.Items Sold\"}]}, \"drillFilterOtherVisuals\": true, \"vcObjects\": {\"title\": [{\"properties\": {\"show\": {\"expr\": {\"Literal\": {\"Value\": \"true\"}}}, \"text\": {\"expr\": {\"Literal\": {\"Value\": \"'Top-selling menu items'\"}}}}}]}}}",
+          "filters": "[]"
+        },
+        {
+          "x": 20,
+          "y": 360,
+          "z": 0,
+          "width": 1240,
+          "height": 340,
+          "config": "{\"name\": \"755681e3b62647c4abae\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 20, \"y\": 360, \"z\": 0, \"width\": 1240, \"height\": 340}}], \"singleVisual\": {\"visualType\": \"tableEx\", \"projections\": {\"Values\": [{\"queryRef\": \"dim_restaurant.restaurant_name\"}, {\"queryRef\": \"dim_restaurant.cuisine_type\"}, {\"queryRef\": \"dim_restaurant.city\"}, {\"queryRef\": \"fact_orders.GMV\"}, {\"queryRef\": \"fact_orders.Avg Rating\"}, {\"queryRef\": \"fact_orders.On-Time %\"}, {\"queryRef\": \"fact_orders.Avg Delivery Minutes\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"t0\", \"Entity\": \"dim_restaurant\", \"Type\": 0}, {\"Name\": \"t1\", \"Entity\": \"fact_orders\", \"Type\": 0}], \"Select\": [{\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"restaurant_name\"}, \"Name\": \"dim_restaurant.restaurant_name\"}, {\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"cuisine_type\"}, \"Name\": \"dim_restaurant.cuisine_type\"}, {\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"city\"}, \"Name\": \"dim_restaurant.city\"}, {\"Measure\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t1\"}}, \"Property\": \"GMV\"}, \"Name\": \"fact_orders.GMV\"}, {\"Measure\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t1\"}}, \"Property\": \"Avg Rating\"}, \"Name\": \"fact_orders.Avg Rating\"}, {\"Measure\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t1\"}}, \"Property\": \"On-Time %\"}, \"Name\": \"fact_orders.On-Time %\"}, {\"Measure\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t1\"}}, \"Property\": \"Avg Delivery Minutes\"}, \"Name\": \"fact_orders.Avg Delivery Minutes\"}]}, \"drillFilterOtherVisuals\": true, \"vcObjects\": {\"title\": [{\"properties\": {\"show\": {\"expr\": {\"Literal\": {\"Value\": \"true\"}}}, \"text\": {\"expr\": {\"Literal\": {\"Value\": \"'Restaurant performance'\"}}}}}]}}}",
+          "filters": "[]"
+        }
+      ]
+    },
+    {
+      "name": "ReportSection4",
+      "displayName": "Pipeline Health",
+      "displayOption": 1,
+      "ordinal": 4,
+      "width": 1280,
+      "height": 720,
+      "config": "{}",
+      "filters": "[]",
+      "visualContainers": [
+        {
+          "x": 20,
+          "y": 20,
+          "z": 0,
+          "width": 198,
+          "height": 110,
+          "config": "{\"name\": \"65f969fa8f854722aac1\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 20, \"y\": 20, \"z\": 0, \"width\": 198, \"height\": 110}}], \"singleVisual\": {\"visualType\": \"card\", \"projections\": {\"Values\": [{\"queryRef\": \"etl_job_log.Pipeline Runs\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"t0\", \"Entity\": \"etl_job_log\", \"Type\": 0}], \"Select\": [{\"Measure\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"Pipeline Runs\"}, \"Name\": \"etl_job_log.Pipeline Runs\"}]}, \"drillFilterOtherVisuals\": true, \"vcObjects\": {\"title\": [{\"properties\": {\"show\": {\"expr\": {\"Literal\": {\"Value\": \"true\"}}}, \"text\": {\"expr\": {\"Literal\": {\"Value\": \"'Pipeline Runs'\"}}}}}]}}}",
+          "filters": "[]"
+        },
+        {
+          "x": 228,
+          "y": 20,
+          "z": 0,
+          "width": 198,
+          "height": 110,
+          "config": "{\"name\": \"063b38c4087248fc8c01\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 228, \"y\": 20, \"z\": 0, \"width\": 198, \"height\": 110}}], \"singleVisual\": {\"visualType\": \"card\", \"projections\": {\"Values\": [{\"queryRef\": \"etl_job_log.Run Success Rate\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"t0\", \"Entity\": \"etl_job_log\", \"Type\": 0}], \"Select\": [{\"Measure\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"Run Success Rate\"}, \"Name\": \"etl_job_log.Run Success Rate\"}]}, \"drillFilterOtherVisuals\": true, \"vcObjects\": {\"title\": [{\"properties\": {\"show\": {\"expr\": {\"Literal\": {\"Value\": \"true\"}}}, \"text\": {\"expr\": {\"Literal\": {\"Value\": \"'Run Success Rate'\"}}}}}]}}}",
+          "filters": "[]"
+        },
+        {
+          "x": 436,
+          "y": 20,
+          "z": 0,
+          "width": 198,
+          "height": 110,
+          "config": "{\"name\": \"d6f2ac33d3844a41b4e0\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 436, \"y\": 20, \"z\": 0, \"width\": 198, \"height\": 110}}], \"singleVisual\": {\"visualType\": \"card\", \"projections\": {\"Values\": [{\"queryRef\": \"etl_job_log.Rows Loaded\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"t0\", \"Entity\": \"etl_job_log\", \"Type\": 0}], \"Select\": [{\"Measure\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"Rows Loaded\"}, \"Name\": \"etl_job_log.Rows Loaded\"}]}, \"drillFilterOtherVisuals\": true, \"vcObjects\": {\"title\": [{\"properties\": {\"show\": {\"expr\": {\"Literal\": {\"Value\": \"true\"}}}, \"text\": {\"expr\": {\"Literal\": {\"Value\": \"'Rows Loaded'\"}}}}}]}}}",
+          "filters": "[]"
+        },
+        {
+          "x": 644,
+          "y": 20,
+          "z": 0,
+          "width": 198,
+          "height": 110,
+          "config": "{\"name\": \"afd404bb3fce431e832b\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 644, \"y\": 20, \"z\": 0, \"width\": 198, \"height\": 110}}], \"singleVisual\": {\"visualType\": \"card\", \"projections\": {\"Values\": [{\"queryRef\": \"etl_job_log.Rows Rejected\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"t0\", \"Entity\": \"etl_job_log\", \"Type\": 0}], \"Select\": [{\"Measure\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"Rows Rejected\"}, \"Name\": \"etl_job_log.Rows Rejected\"}]}, \"drillFilterOtherVisuals\": true, \"vcObjects\": {\"title\": [{\"properties\": {\"show\": {\"expr\": {\"Literal\": {\"Value\": \"true\"}}}, \"text\": {\"expr\": {\"Literal\": {\"Value\": \"'Rows Rejected'\"}}}}}]}}}",
+          "filters": "[]"
+        },
+        {
+          "x": 852,
+          "y": 20,
+          "z": 0,
+          "width": 198,
+          "height": 110,
+          "config": "{\"name\": \"c876fcd8b215412da04d\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 852, \"y\": 20, \"z\": 0, \"width\": 198, \"height\": 110}}], \"singleVisual\": {\"visualType\": \"card\", \"projections\": {\"Values\": [{\"queryRef\": \"dq_results.DQ Warnings\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"t0\", \"Entity\": \"dq_results\", \"Type\": 0}], \"Select\": [{\"Measure\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"DQ Warnings\"}, \"Name\": \"dq_results.DQ Warnings\"}]}, \"drillFilterOtherVisuals\": true, \"vcObjects\": {\"title\": [{\"properties\": {\"show\": {\"expr\": {\"Literal\": {\"Value\": \"true\"}}}, \"text\": {\"expr\": {\"Literal\": {\"Value\": \"'DQ Warnings'\"}}}}}]}}}",
+          "filters": "[]"
+        },
+        {
+          "x": 1060,
+          "y": 20,
+          "z": 0,
+          "width": 198,
+          "height": 110,
+          "config": "{\"name\": \"c4be9588b3df4283ade7\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 1060, \"y\": 20, \"z\": 0, \"width\": 198, \"height\": 110}}], \"singleVisual\": {\"visualType\": \"card\", \"projections\": {\"Values\": [{\"queryRef\": \"etl_batch_hold.Held Batches\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"t0\", \"Entity\": \"etl_batch_hold\", \"Type\": 0}], \"Select\": [{\"Measure\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"Held Batches\"}, \"Name\": \"etl_batch_hold.Held Batches\"}]}, \"drillFilterOtherVisuals\": true, \"vcObjects\": {\"title\": [{\"properties\": {\"show\": {\"expr\": {\"Literal\": {\"Value\": \"true\"}}}, \"text\": {\"expr\": {\"Literal\": {\"Value\": \"'Held Batches'\"}}}}}]}}}",
+          "filters": "[]"
+        },
+        {
+          "x": 20,
+          "y": 145,
+          "z": 0,
+          "width": 620,
+          "height": 280,
+          "config": "{\"name\": \"27d1580eca3b421aafa1\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 20, \"y\": 145, \"z\": 0, \"width\": 620, \"height\": 280}}], \"singleVisual\": {\"visualType\": \"clusteredColumnChart\", \"projections\": {\"Category\": [{\"queryRef\": \"dq_results.batch_id\"}], \"Y\": [{\"queryRef\": \"dq_results.Violations\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"t0\", \"Entity\": \"dq_results\", \"Type\": 0}], \"Select\": [{\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"batch_id\"}, \"Name\": \"dq_results.batch_id\"}, {\"Measure\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"Violations\"}, \"Name\": \"dq_results.Violations\"}]}, \"drillFilterOtherVisuals\": true, \"vcObjects\": {\"title\": [{\"properties\": {\"show\": {\"expr\": {\"Literal\": {\"Value\": \"true\"}}}, \"text\": {\"expr\": {\"Literal\": {\"Value\": \"'DQ violations per batch'\"}}}}}]}}}",
+          "filters": "[]"
+        },
+        {
+          "x": 650,
+          "y": 145,
+          "z": 0,
+          "width": 610,
+          "height": 280,
+          "config": "{\"name\": \"7c04787181b1412baf80\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 650, \"y\": 145, \"z\": 0, \"width\": 610, \"height\": 280}}], \"singleVisual\": {\"visualType\": \"tableEx\", \"projections\": {\"Values\": [{\"queryRef\": \"dq_results.rule_name\"}, {\"queryRef\": \"dq_results.severity\"}, {\"queryRef\": \"dq_results.outcome\"}, {\"queryRef\": \"dq_results.Violations\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"t0\", \"Entity\": \"dq_results\", \"Type\": 0}], \"Select\": [{\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"rule_name\"}, \"Name\": \"dq_results.rule_name\"}, {\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"severity\"}, \"Name\": \"dq_results.severity\"}, {\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"outcome\"}, \"Name\": \"dq_results.outcome\"}, {\"Measure\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"Violations\"}, \"Name\": \"dq_results.Violations\"}]}, \"drillFilterOtherVisuals\": true, \"vcObjects\": {\"title\": [{\"properties\": {\"show\": {\"expr\": {\"Literal\": {\"Value\": \"true\"}}}, \"text\": {\"expr\": {\"Literal\": {\"Value\": \"'DQ rule outcomes'\"}}}}}]}}}",
+          "filters": "[]"
+        },
+        {
+          "x": 20,
+          "y": 435,
+          "z": 0,
+          "width": 1240,
+          "height": 265,
+          "config": "{\"name\": \"618f9ec48ba44c509d0a\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 20, \"y\": 435, \"z\": 0, \"width\": 1240, \"height\": 265}}], \"singleVisual\": {\"visualType\": \"tableEx\", \"projections\": {\"Values\": [{\"queryRef\": \"etl_job_log.batch_id\"}, {\"queryRef\": \"etl_job_log.job_name\"}, {\"queryRef\": \"etl_job_log.status\"}, {\"queryRef\": \"etl_job_log.rows_read\"}, {\"queryRef\": \"etl_job_log.rows_inserted\"}, {\"queryRef\": \"etl_job_log.rows_rejected\"}, {\"queryRef\": \"etl_job_log.duration_seconds\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"t0\", \"Entity\": \"etl_job_log\", \"Type\": 0}], \"Select\": [{\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"batch_id\"}, \"Name\": \"etl_job_log.batch_id\"}, {\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"job_name\"}, \"Name\": \"etl_job_log.job_name\"}, {\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"status\"}, \"Name\": \"etl_job_log.status\"}, {\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"rows_read\"}, \"Name\": \"etl_job_log.rows_read\"}, {\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"rows_inserted\"}, \"Name\": \"etl_job_log.rows_inserted\"}, {\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"rows_rejected\"}, \"Name\": \"etl_job_log.rows_rejected\"}, {\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"duration_seconds\"}, \"Name\": \"etl_job_log.duration_seconds\"}]}, \"drillFilterOtherVisuals\": true, \"vcObjects\": {\"title\": [{\"properties\": {\"show\": {\"expr\": {\"Literal\": {\"Value\": \"true\"}}}, \"text\": {\"expr\": {\"Literal\": {\"Value\": \"'Job log'\"}}}}}]}}}",
+          "filters": "[]"
+        }
+      ]
+    }
+  ]
+}

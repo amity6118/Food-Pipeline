@@ -1,0 +1,1248 @@
+{
+  "name": "FoodOrderAnalytics",
+  "compatibilityLevel": 1567,
+  "model": {
+    "culture": "en-US",
+    "dataAccessOptions": {
+      "legacyRedirects": true,
+      "returnErrorValuesAsNull": true
+    },
+    "defaultPowerBIDataSourceVersion": "powerBI_V3",
+    "sourceQueryCulture": "en-IN",
+    "tables": [
+      {
+        "name": "fact_orders",
+        "columns": [
+          {
+            "name": "order_key",
+            "dataType": "int64",
+            "sourceColumn": "order_key",
+            "summarizeBy": "none",
+            "isHidden": true
+          },
+          {
+            "name": "order_id",
+            "dataType": "string",
+            "sourceColumn": "order_id",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "date_key",
+            "dataType": "int64",
+            "sourceColumn": "date_key",
+            "summarizeBy": "none",
+            "isHidden": true
+          },
+          {
+            "name": "customer_key",
+            "dataType": "int64",
+            "sourceColumn": "customer_key",
+            "summarizeBy": "none",
+            "isHidden": true
+          },
+          {
+            "name": "restaurant_key",
+            "dataType": "int64",
+            "sourceColumn": "restaurant_key",
+            "summarizeBy": "none",
+            "isHidden": true
+          },
+          {
+            "name": "delivery_partner_key",
+            "dataType": "int64",
+            "sourceColumn": "delivery_partner_key",
+            "summarizeBy": "none",
+            "isHidden": true
+          },
+          {
+            "name": "payment_method_key",
+            "dataType": "int64",
+            "sourceColumn": "payment_method_key",
+            "summarizeBy": "none",
+            "isHidden": true
+          },
+          {
+            "name": "order_datetime",
+            "dataType": "dateTime",
+            "sourceColumn": "order_datetime",
+            "summarizeBy": "none",
+            "formatString": "yyyy-mm-dd hh:nn"
+          },
+          {
+            "name": "gross_amount",
+            "dataType": "decimal",
+            "sourceColumn": "gross_amount",
+            "summarizeBy": "sum",
+            "formatString": "\\₹#,0.00"
+          },
+          {
+            "name": "discount",
+            "dataType": "decimal",
+            "sourceColumn": "discount",
+            "summarizeBy": "sum",
+            "formatString": "\\₹#,0.00"
+          },
+          {
+            "name": "delivery_fee",
+            "dataType": "decimal",
+            "sourceColumn": "delivery_fee",
+            "summarizeBy": "sum",
+            "formatString": "\\₹#,0.00"
+          },
+          {
+            "name": "net_amount",
+            "dataType": "decimal",
+            "sourceColumn": "net_amount",
+            "summarizeBy": "sum",
+            "formatString": "\\₹#,0.00"
+          },
+          {
+            "name": "delivery_minutes",
+            "dataType": "int64",
+            "sourceColumn": "delivery_minutes",
+            "summarizeBy": "average"
+          },
+          {
+            "name": "is_late",
+            "dataType": "int64",
+            "sourceColumn": "is_late",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "rating",
+            "dataType": "double",
+            "sourceColumn": "rating",
+            "summarizeBy": "average"
+          },
+          {
+            "name": "order_status",
+            "dataType": "string",
+            "sourceColumn": "order_status",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "batch_id",
+            "dataType": "string",
+            "sourceColumn": "batch_id",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "order_hour",
+            "dataType": "int64",
+            "sourceColumn": "order_hour",
+            "summarizeBy": "none"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "fact_orders",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = MySQL.Database(MySQLServer, WarehouseDatabase, [ReturnSingleDatabase = true]),",
+                "    Data = Source{[Schema = WarehouseDatabase, Item = \"fact_orders\"]}[Data],",
+                "    Selected = Table.SelectColumns(Data, {\"order_key\", \"order_id\", \"date_key\", \"customer_key\", \"restaurant_key\", \"delivery_partner_key\", \"payment_method_key\", \"order_datetime\", \"gross_amount\", \"discount\", \"delivery_fee\", \"net_amount\", \"delivery_minutes\", \"is_late\", \"rating\", \"order_status\", \"batch_id\"}),",
+                "    Flags = Table.TransformColumns(Selected, {{\"is_late\", Number.From, Int64.Type}}),",
+                "    Typed = Table.TransformColumnTypes(Flags, {{\"gross_amount\", Currency.Type}, {\"discount\", Currency.Type}, {\"delivery_fee\", Currency.Type}, {\"net_amount\", Currency.Type}, {\"rating\", type number}}),",
+                "    Added_order_hour = Table.AddColumn(Typed, \"order_hour\", each Time.Hour([order_datetime]), Int64.Type)",
+                "in",
+                "    Added_order_hour"
+              ]
+            }
+          }
+        ],
+        "measures": [
+          {
+            "name": "Total Orders",
+            "expression": "COUNTROWS ( fact_orders )",
+            "formatString": "#,0"
+          },
+          {
+            "name": "Delivered Orders",
+            "expression": "CALCULATE ( [Total Orders], fact_orders[order_status] = \"DELIVERED\" )",
+            "formatString": "#,0"
+          },
+          {
+            "name": "GMV",
+            "expression": "CALCULATE ( SUM ( fact_orders[gross_amount] ), fact_orders[order_status] = \"DELIVERED\" )",
+            "formatString": "\\₹#,0"
+          },
+          {
+            "name": "Net Revenue",
+            "expression": "CALCULATE ( SUM ( fact_orders[net_amount] ), fact_orders[order_status] = \"DELIVERED\" )",
+            "formatString": "\\₹#,0"
+          },
+          {
+            "name": "AOV",
+            "expression": "DIVIDE ( [GMV], [Delivered Orders] )",
+            "formatString": "\\₹#,0.00"
+          },
+          {
+            "name": "Cancellation Rate",
+            "expression": [
+              "DIVIDE (",
+              "    CALCULATE ( [Total Orders], fact_orders[order_status] = \"CANCELLED\" ),",
+              "    [Total Orders]",
+              ")"
+            ],
+            "formatString": "0.0%"
+          },
+          {
+            "name": "On-Time %",
+            "expression": [
+              "DIVIDE (",
+              "    CALCULATE ( [Delivered Orders], fact_orders[is_late] = 0 ),",
+              "    [Delivered Orders]",
+              ")"
+            ],
+            "formatString": "0.0%"
+          },
+          {
+            "name": "Avg Rating",
+            "expression": "AVERAGE ( fact_orders[rating] )   -- blanks (unrated orders) are ignored",
+            "formatString": "0.00"
+          },
+          {
+            "name": "Repeat Customer %",
+            "expression": [
+              "VAR CustomerOrders =",
+              "    ADDCOLUMNS (",
+              "        VALUES ( dim_customer[customer_id] ),     -- natural key, so SCD2 versions count once",
+              "        \"@orders\", CALCULATE ( COUNTROWS ( fact_orders ) )",
+              "    )",
+              "RETURN",
+              "    DIVIDE (",
+              "        COUNTROWS ( FILTER ( CustomerOrders, [@orders] > 1 ) ),",
+              "        COUNTROWS ( FILTER ( CustomerOrders, [@orders] > 0 ) )",
+              "    )"
+            ],
+            "formatString": "0.0%"
+          },
+          {
+            "name": "Avg Delivery Minutes",
+            "expression": "AVERAGE ( fact_orders[delivery_minutes] )",
+            "formatString": "0.0"
+          }
+        ]
+      },
+      {
+        "name": "fact_order_items",
+        "columns": [
+          {
+            "name": "order_item_key",
+            "dataType": "int64",
+            "sourceColumn": "order_item_key",
+            "summarizeBy": "none",
+            "isHidden": true
+          },
+          {
+            "name": "order_key",
+            "dataType": "int64",
+            "sourceColumn": "order_key",
+            "summarizeBy": "none",
+            "isHidden": true
+          },
+          {
+            "name": "menu_item_key",
+            "dataType": "int64",
+            "sourceColumn": "menu_item_key",
+            "summarizeBy": "none",
+            "isHidden": true
+          },
+          {
+            "name": "quantity",
+            "dataType": "int64",
+            "sourceColumn": "quantity",
+            "summarizeBy": "sum"
+          },
+          {
+            "name": "unit_price",
+            "dataType": "decimal",
+            "sourceColumn": "unit_price",
+            "summarizeBy": "sum",
+            "formatString": "\\₹#,0.00"
+          },
+          {
+            "name": "line_total",
+            "dataType": "decimal",
+            "sourceColumn": "line_total",
+            "summarizeBy": "sum",
+            "formatString": "\\₹#,0.00"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "fact_order_items",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = MySQL.Database(MySQLServer, WarehouseDatabase, [ReturnSingleDatabase = true]),",
+                "    Data = Source{[Schema = WarehouseDatabase, Item = \"fact_order_items\"]}[Data],",
+                "    Selected = Table.SelectColumns(Data, {\"order_item_key\", \"order_key\", \"menu_item_key\", \"quantity\", \"unit_price\", \"line_total\"}),",
+                "    Typed = Table.TransformColumnTypes(Selected, {{\"unit_price\", Currency.Type}, {\"line_total\", Currency.Type}})",
+                "in",
+                "    Typed"
+              ]
+            }
+          }
+        ],
+        "measures": [
+          {
+            "name": "Items Sold",
+            "expression": "SUM ( fact_order_items[quantity] )",
+            "formatString": "#,0"
+          }
+        ]
+      },
+      {
+        "name": "dim_date",
+        "columns": [
+          {
+            "name": "date_key",
+            "dataType": "int64",
+            "sourceColumn": "date_key",
+            "summarizeBy": "none",
+            "isHidden": true
+          },
+          {
+            "name": "full_date",
+            "dataType": "dateTime",
+            "sourceColumn": "full_date",
+            "summarizeBy": "none",
+            "formatString": "yyyy-mm-dd",
+            "isKey": true
+          },
+          {
+            "name": "year",
+            "dataType": "int64",
+            "sourceColumn": "year",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "quarter",
+            "dataType": "int64",
+            "sourceColumn": "quarter",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "quarter_name",
+            "dataType": "string",
+            "sourceColumn": "quarter_name",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "month",
+            "dataType": "int64",
+            "sourceColumn": "month",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "month_name",
+            "dataType": "string",
+            "sourceColumn": "month_name",
+            "summarizeBy": "none",
+            "sortByColumn": "month"
+          },
+          {
+            "name": "month_short",
+            "dataType": "string",
+            "sourceColumn": "month_short",
+            "summarizeBy": "none",
+            "sortByColumn": "month"
+          },
+          {
+            "name": "month_label",
+            "dataType": "string",
+            "sourceColumn": "month_label",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "week_of_year",
+            "dataType": "int64",
+            "sourceColumn": "week_of_year",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "day_of_month",
+            "dataType": "int64",
+            "sourceColumn": "day_of_month",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "day_of_week",
+            "dataType": "int64",
+            "sourceColumn": "day_of_week",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "day_name",
+            "dataType": "string",
+            "sourceColumn": "day_name",
+            "summarizeBy": "none",
+            "sortByColumn": "day_of_week"
+          },
+          {
+            "name": "day_short",
+            "dataType": "string",
+            "sourceColumn": "day_short",
+            "summarizeBy": "none",
+            "sortByColumn": "day_of_week"
+          },
+          {
+            "name": "is_weekend",
+            "dataType": "int64",
+            "sourceColumn": "is_weekend",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "is_holiday",
+            "dataType": "int64",
+            "sourceColumn": "is_holiday",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "is_festival",
+            "dataType": "int64",
+            "sourceColumn": "is_festival",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "holiday_name",
+            "dataType": "string",
+            "sourceColumn": "holiday_name",
+            "summarizeBy": "none"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "dim_date",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = MySQL.Database(MySQLServer, WarehouseDatabase, [ReturnSingleDatabase = true]),",
+                "    Data = Source{[Schema = WarehouseDatabase, Item = \"dim_date\"]}[Data],",
+                "    Selected = Table.SelectColumns(Data, {\"date_key\", \"full_date\", \"year\", \"quarter\", \"quarter_name\", \"month\", \"month_name\", \"month_short\", \"month_label\", \"week_of_year\", \"day_of_month\", \"day_of_week\", \"day_name\", \"day_short\", \"is_weekend\", \"is_holiday\", \"is_festival\", \"holiday_name\"}),",
+                "    Flags = Table.TransformColumns(Selected, {{\"is_weekend\", Number.From, Int64.Type}, {\"is_holiday\", Number.From, Int64.Type}, {\"is_festival\", Number.From, Int64.Type}}),",
+                "    Typed = Table.TransformColumnTypes(Flags, {{\"full_date\", type date}})",
+                "in",
+                "    Typed"
+              ]
+            }
+          }
+        ],
+        "dataCategory": "Time"
+      },
+      {
+        "name": "dim_customer",
+        "columns": [
+          {
+            "name": "customer_key",
+            "dataType": "int64",
+            "sourceColumn": "customer_key",
+            "summarizeBy": "none",
+            "isHidden": true
+          },
+          {
+            "name": "customer_id",
+            "dataType": "string",
+            "sourceColumn": "customer_id",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "customer_name",
+            "dataType": "string",
+            "sourceColumn": "customer_name",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "city",
+            "dataType": "string",
+            "sourceColumn": "city",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "state",
+            "dataType": "string",
+            "sourceColumn": "state",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "pincode",
+            "dataType": "string",
+            "sourceColumn": "pincode",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "signup_date",
+            "dataType": "dateTime",
+            "sourceColumn": "signup_date",
+            "summarizeBy": "none",
+            "formatString": "yyyy-mm-dd"
+          },
+          {
+            "name": "scd_version",
+            "dataType": "int64",
+            "sourceColumn": "scd_version",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "valid_from",
+            "dataType": "dateTime",
+            "sourceColumn": "valid_from",
+            "summarizeBy": "none",
+            "formatString": "yyyy-mm-dd"
+          },
+          {
+            "name": "valid_to",
+            "dataType": "dateTime",
+            "sourceColumn": "valid_to",
+            "summarizeBy": "none",
+            "formatString": "yyyy-mm-dd"
+          },
+          {
+            "name": "is_current",
+            "dataType": "int64",
+            "sourceColumn": "is_current",
+            "summarizeBy": "none"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "dim_customer",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = MySQL.Database(MySQLServer, WarehouseDatabase, [ReturnSingleDatabase = true]),",
+                "    Data = Source{[Schema = WarehouseDatabase, Item = \"dim_customer\"]}[Data],",
+                "    Selected = Table.SelectColumns(Data, {\"customer_key\", \"customer_id\", \"customer_name\", \"city\", \"state\", \"pincode\", \"signup_date\", \"scd_version\", \"valid_from\", \"valid_to\", \"is_current\"}),",
+                "    Flags = Table.TransformColumns(Selected, {{\"is_current\", Number.From, Int64.Type}}),",
+                "    Typed = Table.TransformColumnTypes(Flags, {{\"signup_date\", type date}})",
+                "in",
+                "    Typed"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "dim_restaurant",
+        "columns": [
+          {
+            "name": "restaurant_key",
+            "dataType": "int64",
+            "sourceColumn": "restaurant_key",
+            "summarizeBy": "none",
+            "isHidden": true
+          },
+          {
+            "name": "restaurant_id",
+            "dataType": "string",
+            "sourceColumn": "restaurant_id",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "restaurant_name",
+            "dataType": "string",
+            "sourceColumn": "restaurant_name",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "cuisine_type",
+            "dataType": "string",
+            "sourceColumn": "cuisine_type",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "city",
+            "dataType": "string",
+            "sourceColumn": "city",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "area",
+            "dataType": "string",
+            "sourceColumn": "area",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "rating",
+            "dataType": "double",
+            "sourceColumn": "rating",
+            "summarizeBy": "average"
+          },
+          {
+            "name": "cost_for_two",
+            "dataType": "decimal",
+            "sourceColumn": "cost_for_two",
+            "summarizeBy": "sum",
+            "formatString": "\\₹#,0.00"
+          },
+          {
+            "name": "is_active_partner",
+            "dataType": "int64",
+            "sourceColumn": "is_active_partner",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "scd_version",
+            "dataType": "int64",
+            "sourceColumn": "scd_version",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "valid_from",
+            "dataType": "dateTime",
+            "sourceColumn": "valid_from",
+            "summarizeBy": "none",
+            "formatString": "yyyy-mm-dd"
+          },
+          {
+            "name": "valid_to",
+            "dataType": "dateTime",
+            "sourceColumn": "valid_to",
+            "summarizeBy": "none",
+            "formatString": "yyyy-mm-dd"
+          },
+          {
+            "name": "is_current",
+            "dataType": "int64",
+            "sourceColumn": "is_current",
+            "summarizeBy": "none"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "dim_restaurant",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = MySQL.Database(MySQLServer, WarehouseDatabase, [ReturnSingleDatabase = true]),",
+                "    Data = Source{[Schema = WarehouseDatabase, Item = \"dim_restaurant\"]}[Data],",
+                "    Selected = Table.SelectColumns(Data, {\"restaurant_key\", \"restaurant_id\", \"restaurant_name\", \"cuisine_type\", \"city\", \"area\", \"rating\", \"cost_for_two\", \"is_active_partner\", \"scd_version\", \"valid_from\", \"valid_to\", \"is_current\"}),",
+                "    Flags = Table.TransformColumns(Selected, {{\"is_active_partner\", Number.From, Int64.Type}, {\"is_current\", Number.From, Int64.Type}}),",
+                "    Typed = Table.TransformColumnTypes(Flags, {{\"cost_for_two\", Currency.Type}, {\"rating\", type number}})",
+                "in",
+                "    Typed"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "dim_menu_item",
+        "columns": [
+          {
+            "name": "menu_item_key",
+            "dataType": "int64",
+            "sourceColumn": "menu_item_key",
+            "summarizeBy": "none",
+            "isHidden": true
+          },
+          {
+            "name": "item_id",
+            "dataType": "string",
+            "sourceColumn": "item_id",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "restaurant_id",
+            "dataType": "string",
+            "sourceColumn": "restaurant_id",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "item_name",
+            "dataType": "string",
+            "sourceColumn": "item_name",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "category",
+            "dataType": "string",
+            "sourceColumn": "category",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "is_veg",
+            "dataType": "int64",
+            "sourceColumn": "is_veg",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "base_price",
+            "dataType": "decimal",
+            "sourceColumn": "base_price",
+            "summarizeBy": "sum",
+            "formatString": "\\₹#,0.00"
+          },
+          {
+            "name": "is_available",
+            "dataType": "int64",
+            "sourceColumn": "is_available",
+            "summarizeBy": "none"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "dim_menu_item",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = MySQL.Database(MySQLServer, WarehouseDatabase, [ReturnSingleDatabase = true]),",
+                "    Data = Source{[Schema = WarehouseDatabase, Item = \"dim_menu_item\"]}[Data],",
+                "    Selected = Table.SelectColumns(Data, {\"menu_item_key\", \"item_id\", \"restaurant_id\", \"item_name\", \"category\", \"is_veg\", \"base_price\", \"is_available\"}),",
+                "    Flags = Table.TransformColumns(Selected, {{\"is_veg\", Number.From, Int64.Type}, {\"is_available\", Number.From, Int64.Type}}),",
+                "    Typed = Table.TransformColumnTypes(Flags, {{\"base_price\", Currency.Type}})",
+                "in",
+                "    Typed"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "dim_delivery_partner",
+        "columns": [
+          {
+            "name": "delivery_partner_key",
+            "dataType": "int64",
+            "sourceColumn": "delivery_partner_key",
+            "summarizeBy": "none",
+            "isHidden": true
+          },
+          {
+            "name": "partner_id",
+            "dataType": "string",
+            "sourceColumn": "partner_id",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "partner_name",
+            "dataType": "string",
+            "sourceColumn": "partner_name",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "vehicle_type",
+            "dataType": "string",
+            "sourceColumn": "vehicle_type",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "city",
+            "dataType": "string",
+            "sourceColumn": "city",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "rating",
+            "dataType": "double",
+            "sourceColumn": "rating",
+            "summarizeBy": "average"
+          },
+          {
+            "name": "status",
+            "dataType": "string",
+            "sourceColumn": "status",
+            "summarizeBy": "none"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "dim_delivery_partner",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = MySQL.Database(MySQLServer, WarehouseDatabase, [ReturnSingleDatabase = true]),",
+                "    Data = Source{[Schema = WarehouseDatabase, Item = \"dim_delivery_partner\"]}[Data],",
+                "    Selected = Table.SelectColumns(Data, {\"delivery_partner_key\", \"partner_id\", \"partner_name\", \"vehicle_type\", \"city\", \"rating\", \"status\"}),",
+                "    Typed = Table.TransformColumnTypes(Selected, {{\"rating\", type number}})",
+                "in",
+                "    Typed"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "dim_payment_method",
+        "columns": [
+          {
+            "name": "payment_method_key",
+            "dataType": "int64",
+            "sourceColumn": "payment_method_key",
+            "summarizeBy": "none",
+            "isHidden": true
+          },
+          {
+            "name": "payment_method_id",
+            "dataType": "string",
+            "sourceColumn": "payment_method_id",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "method_name",
+            "dataType": "string",
+            "sourceColumn": "method_name",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "method_category",
+            "dataType": "string",
+            "sourceColumn": "method_category",
+            "summarizeBy": "none"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "dim_payment_method",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = MySQL.Database(MySQLServer, WarehouseDatabase, [ReturnSingleDatabase = true]),",
+                "    Data = Source{[Schema = WarehouseDatabase, Item = \"dim_payment_method\"]}[Data],",
+                "    Selected = Table.SelectColumns(Data, {\"payment_method_key\", \"payment_method_id\", \"method_name\", \"method_category\"})",
+                "in",
+                "    Selected"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "etl_job_log",
+        "columns": [
+          {
+            "name": "job_id",
+            "dataType": "int64",
+            "sourceColumn": "job_id",
+            "summarizeBy": "none",
+            "isHidden": true
+          },
+          {
+            "name": "job_name",
+            "dataType": "string",
+            "sourceColumn": "job_name",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "batch_id",
+            "dataType": "string",
+            "sourceColumn": "batch_id",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "status",
+            "dataType": "string",
+            "sourceColumn": "status",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "start_time",
+            "dataType": "dateTime",
+            "sourceColumn": "start_time",
+            "summarizeBy": "none",
+            "formatString": "yyyy-mm-dd hh:nn:ss"
+          },
+          {
+            "name": "end_time",
+            "dataType": "dateTime",
+            "sourceColumn": "end_time",
+            "summarizeBy": "none",
+            "formatString": "yyyy-mm-dd hh:nn:ss"
+          },
+          {
+            "name": "duration_seconds",
+            "dataType": "int64",
+            "sourceColumn": "duration_seconds",
+            "summarizeBy": "sum"
+          },
+          {
+            "name": "rows_read",
+            "dataType": "int64",
+            "sourceColumn": "rows_read",
+            "summarizeBy": "sum"
+          },
+          {
+            "name": "rows_inserted",
+            "dataType": "int64",
+            "sourceColumn": "rows_inserted",
+            "summarizeBy": "sum"
+          },
+          {
+            "name": "rows_updated",
+            "dataType": "int64",
+            "sourceColumn": "rows_updated",
+            "summarizeBy": "sum"
+          },
+          {
+            "name": "rows_rejected",
+            "dataType": "int64",
+            "sourceColumn": "rows_rejected",
+            "summarizeBy": "sum"
+          },
+          {
+            "name": "error_message",
+            "dataType": "string",
+            "sourceColumn": "error_message",
+            "summarizeBy": "none"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "etl_job_log",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = MySQL.Database(MySQLServer, ControlDatabase, [ReturnSingleDatabase = true]),",
+                "    Data = Source{[Schema = ControlDatabase, Item = \"etl_job_log\"]}[Data],",
+                "    Selected = Table.SelectColumns(Data, {\"job_id\", \"job_name\", \"batch_id\", \"status\", \"start_time\", \"end_time\", \"duration_seconds\", \"rows_read\", \"rows_inserted\", \"rows_updated\", \"rows_rejected\", \"error_message\"})",
+                "in",
+                "    Selected"
+              ]
+            }
+          }
+        ],
+        "measures": [
+          {
+            "name": "Pipeline Runs",
+            "expression": "CALCULATE ( COUNTROWS ( etl_job_log ), etl_job_log[job_name] = \"pipeline_run\" )",
+            "formatString": "#,0"
+          },
+          {
+            "name": "Failed Runs",
+            "expression": "CALCULATE ( [Pipeline Runs], etl_job_log[status] = \"FAILED\" )",
+            "formatString": "#,0"
+          },
+          {
+            "name": "Run Success Rate",
+            "expression": "DIVIDE ( [Pipeline Runs] - [Failed Runs], [Pipeline Runs] )",
+            "formatString": "0.0%"
+          },
+          {
+            "name": "Rows Loaded",
+            "expression": "CALCULATE ( SUM ( etl_job_log[rows_inserted] ), LEFT ( etl_job_log[job_name], 7 ) = \"sp_load\" )",
+            "formatString": "#,0"
+          },
+          {
+            "name": "Rows Rejected",
+            "expression": "CALCULATE ( SUM ( etl_job_log[rows_rejected] ), LEFT ( etl_job_log[job_name], 7 ) = \"sp_load\" )",
+            "formatString": "#,0"
+          },
+          {
+            "name": "Avg Run Seconds",
+            "expression": "CALCULATE ( AVERAGE ( etl_job_log[duration_seconds] ), etl_job_log[job_name] = \"pipeline_run\" )",
+            "formatString": "0.0"
+          }
+        ]
+      },
+      {
+        "name": "etl_error_log",
+        "columns": [
+          {
+            "name": "error_id",
+            "dataType": "int64",
+            "sourceColumn": "error_id",
+            "summarizeBy": "none",
+            "isHidden": true
+          },
+          {
+            "name": "job_id",
+            "dataType": "int64",
+            "sourceColumn": "job_id",
+            "summarizeBy": "none",
+            "isHidden": true
+          },
+          {
+            "name": "batch_id",
+            "dataType": "string",
+            "sourceColumn": "batch_id",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "step_name",
+            "dataType": "string",
+            "sourceColumn": "step_name",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "error_code",
+            "dataType": "string",
+            "sourceColumn": "error_code",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "error_message",
+            "dataType": "string",
+            "sourceColumn": "error_message",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "created_at",
+            "dataType": "dateTime",
+            "sourceColumn": "created_at",
+            "summarizeBy": "none",
+            "formatString": "yyyy-mm-dd hh:nn:ss"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "etl_error_log",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = MySQL.Database(MySQLServer, ControlDatabase, [ReturnSingleDatabase = true]),",
+                "    Data = Source{[Schema = ControlDatabase, Item = \"etl_error_log\"]}[Data],",
+                "    Selected = Table.SelectColumns(Data, {\"error_id\", \"job_id\", \"batch_id\", \"step_name\", \"error_code\", \"error_message\", \"created_at\"})",
+                "in",
+                "    Selected"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "dq_results",
+        "columns": [
+          {
+            "name": "result_id",
+            "dataType": "int64",
+            "sourceColumn": "result_id",
+            "summarizeBy": "none",
+            "isHidden": true
+          },
+          {
+            "name": "batch_id",
+            "dataType": "string",
+            "sourceColumn": "batch_id",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "rule_name",
+            "dataType": "string",
+            "sourceColumn": "rule_name",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "stage",
+            "dataType": "string",
+            "sourceColumn": "stage",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "severity",
+            "dataType": "string",
+            "sourceColumn": "severity",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "violation_count",
+            "dataType": "int64",
+            "sourceColumn": "violation_count",
+            "summarizeBy": "sum"
+          },
+          {
+            "name": "outcome",
+            "dataType": "string",
+            "sourceColumn": "outcome",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "executed_at",
+            "dataType": "dateTime",
+            "sourceColumn": "executed_at",
+            "summarizeBy": "none",
+            "formatString": "yyyy-mm-dd hh:nn:ss"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "dq_results",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = MySQL.Database(MySQLServer, ControlDatabase, [ReturnSingleDatabase = true]),",
+                "    Data = Source{[Schema = ControlDatabase, Item = \"dq_results\"]}[Data],",
+                "    Selected = Table.SelectColumns(Data, {\"result_id\", \"batch_id\", \"rule_name\", \"stage\", \"severity\", \"violation_count\", \"outcome\", \"executed_at\"})",
+                "in",
+                "    Selected"
+              ]
+            }
+          }
+        ],
+        "measures": [
+          {
+            "name": "DQ Warnings",
+            "expression": "CALCULATE ( COUNTROWS ( dq_results ), dq_results[outcome] = \"WARN\" )",
+            "formatString": "#,0"
+          },
+          {
+            "name": "DQ Failures",
+            "expression": "CALCULATE ( COUNTROWS ( dq_results ), dq_results[outcome] = \"FAIL\" )",
+            "formatString": "#,0"
+          },
+          {
+            "name": "Violations",
+            "expression": "SUM ( dq_results[violation_count] )",
+            "formatString": "#,0"
+          }
+        ]
+      },
+      {
+        "name": "etl_batch_hold",
+        "columns": [
+          {
+            "name": "batch_id",
+            "dataType": "string",
+            "sourceColumn": "batch_id",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "reason",
+            "dataType": "string",
+            "sourceColumn": "reason",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "held_at",
+            "dataType": "dateTime",
+            "sourceColumn": "held_at",
+            "summarizeBy": "none",
+            "formatString": "yyyy-mm-dd hh:nn:ss"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "etl_batch_hold",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = MySQL.Database(MySQLServer, ControlDatabase, [ReturnSingleDatabase = true]),",
+                "    Data = Source{[Schema = ControlDatabase, Item = \"etl_batch_hold\"]}[Data],",
+                "    Selected = Table.SelectColumns(Data, {\"batch_id\", \"reason\", \"held_at\"})",
+                "in",
+                "    Selected"
+              ]
+            }
+          }
+        ],
+        "measures": [
+          {
+            "name": "Held Batches",
+            "expression": "COUNTROWS ( etl_batch_hold )",
+            "formatString": "#,0"
+          }
+        ]
+      }
+    ],
+    "relationships": [
+      {
+        "name": "fact_orders_date_key__dim_date",
+        "fromTable": "fact_orders",
+        "fromColumn": "date_key",
+        "toTable": "dim_date",
+        "toColumn": "date_key"
+      },
+      {
+        "name": "fact_orders_customer_key__dim_customer",
+        "fromTable": "fact_orders",
+        "fromColumn": "customer_key",
+        "toTable": "dim_customer",
+        "toColumn": "customer_key"
+      },
+      {
+        "name": "fact_orders_restaurant_key__dim_restaurant",
+        "fromTable": "fact_orders",
+        "fromColumn": "restaurant_key",
+        "toTable": "dim_restaurant",
+        "toColumn": "restaurant_key"
+      },
+      {
+        "name": "fact_orders_delivery_partner_key__dim_delivery_partner",
+        "fromTable": "fact_orders",
+        "fromColumn": "delivery_partner_key",
+        "toTable": "dim_delivery_partner",
+        "toColumn": "delivery_partner_key"
+      },
+      {
+        "name": "fact_orders_payment_method_key__dim_payment_method",
+        "fromTable": "fact_orders",
+        "fromColumn": "payment_method_key",
+        "toTable": "dim_payment_method",
+        "toColumn": "payment_method_key"
+      },
+      {
+        "name": "fact_order_items_order_key__fact_orders",
+        "fromTable": "fact_order_items",
+        "fromColumn": "order_key",
+        "toTable": "fact_orders",
+        "toColumn": "order_key"
+      },
+      {
+        "name": "fact_order_items_menu_item_key__dim_menu_item",
+        "fromTable": "fact_order_items",
+        "fromColumn": "menu_item_key",
+        "toTable": "dim_menu_item",
+        "toColumn": "menu_item_key"
+      },
+      {
+        "name": "etl_error_log_job_id__etl_job_log",
+        "fromTable": "etl_error_log",
+        "fromColumn": "job_id",
+        "toTable": "etl_job_log",
+        "toColumn": "job_id"
+      }
+    ],
+    "expressions": [
+      {
+        "name": "MySQLServer",
+        "kind": "m",
+        "expression": "\"localhost:3306\" meta [IsParameterQuery = true, Type = \"Text\", IsParameterQueryRequired = true]"
+      },
+      {
+        "name": "WarehouseDatabase",
+        "kind": "m",
+        "expression": "\"food_dw\" meta [IsParameterQuery = true, Type = \"Text\", IsParameterQueryRequired = true]"
+      },
+      {
+        "name": "ControlDatabase",
+        "kind": "m",
+        "expression": "\"food_control\" meta [IsParameterQuery = true, Type = \"Text\", IsParameterQueryRequired = true]"
+      }
+    ],
+    "annotations": [
+      {
+        "name": "PBI_QueryOrder",
+        "value": "[\"MySQLServer\", \"WarehouseDatabase\", \"ControlDatabase\", \"fact_orders\", \"fact_order_items\", \"dim_date\", \"dim_customer\", \"dim_restaurant\", \"dim_menu_item\", \"dim_delivery_partner\", \"dim_payment_method\", \"etl_job_log\", \"etl_error_log\", \"dq_results\", \"etl_batch_hold\"]"
+      },
+      {
+        "name": "__PBI_TimeIntelligenceEnabled",
+        "value": "0"
+      }
+    ]
+  }
+}

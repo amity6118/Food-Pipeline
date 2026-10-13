@@ -52,3 +52,7 @@ logs/*
 *.swo
 .DS_Store
 Thumbs.db
+
+# Power BI Desktop local files (cached data and per-user settings)
+**/.pbi/localSettings.json
+**/.pbi/cache.abf

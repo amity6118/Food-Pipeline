@@ -130,6 +130,7 @@ food-order-pipeline/
 ├── .env.example                # copy to .env and set real passwords
 ├── requirements.txt            # exact pins for reproducible builds
 ├── pytest.ini
+├── powerbi/                    # Power BI project: FoodOrderAnalytics.pbip (model + report)
 ├── docs/
 │   ├── ARCHITECTURE.md         # detailed diagrams
 │   └── images/                 # architecture + star schema images
@@ -392,18 +393,40 @@ SELECT COUNT(*), SUM(is_holiday), SUM(is_festival) FROM food_dw.dim_date;
 
 ## Connecting Power BI
 
-1. In Power BI Desktop, go to **Get Data → MySQL database**.
-2. **Server:** `localhost:3306` (or the `HOST_MYSQL_PORT` you set). **Database:** `food_dw`.
-3. **Data connectivity mode:** Import (recommended for this data volume).
-4. On the credentials screen choose the **Database** tab and enter
-   `POWERBI_USER` / `POWERBI_PASSWORD` from your `.env`.
-5. Load the `fact_*` and `dim_*` tables. Power BI picks up the relationships from
-   the foreign keys. Mark `dim_date` as the date table.
-6. For the pipeline-health page, add a second MySQL source with database
-   `food_control` (`etl_job_log`, `etl_error_log`, `dq_results`, `etl_batch_hold`).
+The report ships as a **Power BI project** (`powerbi/FoodOrderAnalytics.pbip`):
+plain-text files that git can diff. The semantic model is already built:
 
-If the connector reports a missing driver, install **MySQL Connector/NET** and
-restart Power BI Desktop.
+- 12 tables in Import mode: the star schema from `food_dw` plus `etl_job_log`,
+  `etl_error_log`, `dq_results` and `etl_batch_hold` from `food_control`
+- 8 relationships, surrogate keys hidden, `dim_date` marked as the date table,
+  month and day names sorted by their numbers
+- every measure below, plus pipeline-health measures (runs, success rate,
+  rows loaded/rejected, DQ warnings, held batches)
+- 5 report pages: Executive Overview, Sales, Customers, Restaurants, Pipeline Health
+
+### Open it
+
+1. Install **MySQL Connector/NET 8.x** (https://dev.mysql.com/downloads/connector/net/).
+   Power BI's MySQL connector needs it. Restart Power BI Desktop afterwards.
+2. Start the stack and load some data (see [Running the pipeline](#running-the-pipeline)).
+3. Open `powerbi/FoodOrderAnalytics.pbip` in Power BI Desktop and click **Refresh**.
+4. When asked for credentials for `localhost:3306`, choose the **Database** tab and
+   enter `POWERBI_USER` / `POWERBI_PASSWORD` from your `.env`. Power BI stores
+   them locally, not in the project files.
+
+If MySQL is not on `localhost:3306`, change the `MySQLServer` parameter under
+**Transform data → Edit parameters**.
+
+The MySQL connector returns `TINYINT(1)` columns as true/false. The project's
+queries convert those flags (`is_late`, `is_weekend`, …) back to 1/0, so the
+measures below work as written.
+
+### Building it from scratch instead
+
+**Get Data → MySQL database**, server `localhost:3306`, database `food_dw`, Import
+mode, **Database** credentials as above. Load the `fact_*` and `dim_*` tables,
+check the relationships on the `*_key` columns and mark `dim_date` as the date
+table. Add a second source for `food_control` for the pipeline-health page.
 
 ---
 
@@ -478,11 +501,12 @@ RETURN
 - [x] `run_pipeline.py` with `--date`, `--step`, `--full-refresh`, `--schedule`; pluggable failure alerts
 - [x] Structured JSON logging; full audit trail in `food_control`
 - [x] 64 pytest tests (unit + MySQL integration) and a reconciliation script
+- [x] Power BI project (`.pbip`): semantic model with relationships, date table, all measures, and 5 report pages
 
 ## Next steps
 
-1. **Build the Power BI report** with the five pages and measures above, then
-   publish it to Power BI Service with a scheduled refresh through a gateway.
+1. **Polish and publish the Power BI report:** apply a theme and conditional
+   formatting, then publish to Power BI Service with a scheduled refresh through a gateway.
 2. **Migrate orchestration to Apache Airflow:** one task per pipeline step,
    retries, backfills from the UI, and SLA alerting.
 3. **Deploy to the cloud:** managed MySQL (AWS RDS / Azure Database for MySQL),
