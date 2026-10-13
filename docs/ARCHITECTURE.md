@@ -75,7 +75,7 @@ flowchart TD
     RUN["run_pipeline.py<br/>creates batch_id"] --> S1["generate / extract"]
     S1 --> S2["ingest → staging"]
     S2 --> S3["DQ checks (staging rules)"]
-    S3 -->|FAIL severity| STOP
+    S3 -->|FAIL severity| HOLD["hold batch<br/>(etl_batch_hold)"] --> STOP
     S3 -->|pass / WARN| S4["sp_load_dim_* (dependency order)"]
     S4 --> S5["sp_load_fact_orders → sp_load_fact_order_items"]
     S5 --> S6["DQ checks (warehouse rules)"]
@@ -86,6 +86,7 @@ flowchart TD
 
 - Each step writes a `RUNNING` row to `etl_job_log`, then updates it to `SUCCESS` or `FAILED`.
 - Every stored procedure declares `DECLARE EXIT HANDLER FOR SQLEXCEPTION`. The handler rolls back, marks the job `FAILED` and writes the error to `etl_error_log`.
+- A staging `FAIL` also holds the batch: every load procedure skips it until it passes staging DQ again, when its rows are re-queued.
 - If a step fails, none of the steps after it run.
 
 ## 3. Warehouse star schema
@@ -154,15 +155,17 @@ All foreign keys and `date_key` are indexed.
 | **Processing** (stored procedures) | Trim and cast, `net_amount`, `is_late`, status mapping, surrogate keys, SCD2, upserts | — |
 | **Warehouse** (`food_dw`) | Typed star schema with indexes on every foreign key | — |
 | **Control** (`food_control`) | Job and error logs, DQ rules and results, watermarks | — |
-| **Data quality** | Runs the SQL in `dq_rules` (null, range, referential, freshness checks) and writes `dq_results`. `WARN` logs and continues; `FAIL` stops the run | — |
+| **Data quality** | Runs the SQL in `dq_rules` (null, range, format, uniqueness, referential, freshness, volume, reconciliation checks) and writes `dq_results`. `WARN` logs and continues; `FAIL` stops the run (and holds a failed staging batch) | — |
 | **Reporting** | Power BI on `food_dw` (business pages) and `food_control` (pipeline health), using a SELECT-only user | Reading staging |
 
 ### Idempotency
 
 - Each run date gets a predictable `batch_id`.
 - Staging rows are deleted by `batch_id` before that batch is reloaded.
-- Facts are upserted on the natural key (`order_id`). Order items are deleted and reinserted per order.
-- SCD2 adds a new dimension version only when the hash of the tracked attributes changes.
+- Re-inserted staging rows get new `stg_id`s, so the procedures' watermarks pick them up again.
+- Facts are upserted on their grain: `order_id` for orders, `(order_key, menu_item_key)` for order items.
+- SCD2 adds a new dimension version only when the hash of the tracked attributes changes, and a
+  replayed older batch cannot rewrite newer history.
 
 As a result, running the same date again leaves row counts unchanged.
 
@@ -213,8 +216,9 @@ food-order-pipeline/
 │   │   01_create_databases.sql           02_create_staging_tables.sql
 │   │   03_create_control_tables.sql      04_create_dw_tables.sql
 │   │   05_create_cleansing_functions.sql 06_create_dim_date.sql
-│   │   07_seed_control_data.sql          08_procedures_dimensions.sql
-│   │   09_procedures_facts.sql           10_procedure_master.sql
+│   │   07_seed_control_data.sql          08_procedures_control.sql
+│   │   09_procedures_dimensions.sql      10_procedures_facts.sql
+│   │   11_procedures_orchestration.sql
 │   │   99_create_app_users.sh            # users from .env, runs last
 │   └── validation/
 │       reconciliation.sql           # staging ↔ DW row counts
@@ -225,10 +229,11 @@ food-order-pipeline/
 │   ├── ingestion/     sources.py  extract.py  validate.py  parse.py  load.py
 │   │                  file_mover.py  runner.py
 │   ├── processing/    procedure_runner.py
-│   ├── quality/       dq_engine.py
+│   ├── quality/       dq_engine.py  profiler.py  batch_hold.py
 │   └── orchestration/ pipeline.py  scheduler.py  notifier.py
 ├── tests/
-│   conftest.py  test_validate.py  test_parse.py  test_dq_engine.py  test_transformations.py
+│   conftest.py  test_batch.py  test_generator.py  test_ingestion.py
+│   test_orchestration.py  test_warehouse_integration.py
 ├── data/   landing/  archive/  error/
 └── logs/
 ```
