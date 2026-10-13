@@ -115,7 +115,8 @@ can report on.
 food-order-pipeline/
 ├── docker-compose.yml          # mysql, mock_api, etl, adminer
 ├── .env.example                # copy to .env and set real passwords
-├── requirements.txt
+├── .dockerignore               # keeps .env and data out of images
+├── requirements.txt            # exact pins for reproducible builds
 ├── docs/
 │   ├── ARCHITECTURE.md         # detailed diagrams
 │   └── images/                 # README images (architecture, star schema)
@@ -134,8 +135,13 @@ food-order-pipeline/
 │   └── procedures/
 ├── src/
 │   ├── config.py               # all settings from environment variables
-│   ├── generator/              # Faker data generators
-│   └── utils/                  # DB engine + logging helpers
+│   ├── generator/              # Faker data generators + mock orders API
+│   ├── ingestion/              # extract · validate · parse · load
+│   ├── processing/             # stored-procedure runner
+│   ├── quality/                # rule-driven DQ engine
+│   ├── orchestration/          # pipeline runner, scheduler, notifier
+│   └── utils/                  # DB engine, logging, connectivity check
+├── tests/
 ├── data/
 │   ├── landing/                # incoming files
 │   ├── archive/                # processed files
@@ -169,24 +175,38 @@ notepad .env
 ```
 
 Replace every `change_me_*` value with your own password. Don't use single
-quotes in passwords. If a local MySQL server already uses port 3306, set
-`HOST_MYSQL_PORT=3307`.
+quotes in passwords. If a local MySQL server already uses port 3306, set both
+`HOST_MYSQL_PORT=3307` and `MYSQL_PORT=3307`.
 
-### 3. Start the stack
+### 3. Build and start the stack
 
 ```powershell
-# Currently available services (database + browser UI)
-docker compose up -d mysql adminer
-
-# Watch the first-boot init scripts run (Ctrl+C to stop following)
-docker compose logs -f mysql
+docker compose up -d --build
+docker compose ps -a
 ```
 
-When the log shows `ready for connections` after the init scripts finish, the
-databases, tables, users and `dim_date` are all in place.
+The first boot takes about a minute while MySQL runs its init scripts. Expected
+state:
 
-> The `mock_api` and `etl` services depend on modules that are still being built.
-> Once they exist, start everything with `docker compose up -d --build`.
+| Service | Status |
+|---|---|
+| `food_order_mysql` | Up (healthy) |
+| `food_order_mock_api` | Up (healthy) |
+| `food_order_adminer` | Up |
+| `food_order_etl` | Exited (0): it runs a connectivity check and stops. The scheduler replaces this in a later phase |
+
+```powershell
+docker compose logs etl
+```
+
+```
+[...] [INFO] [src.utils.healthcheck]: food_staging  OK (7 tables)
+[...] [INFO] [src.utils.healthcheck]: food_control  OK (5 tables)
+[...] [INFO] [src.utils.healthcheck]: food_dw       OK (8 tables)
+```
+
+Re-run the check at any time with
+`docker compose run --rm etl python -m src.utils.healthcheck`.
 
 ### 4. Reset from scratch (optional)
 
@@ -195,7 +215,7 @@ databases from scratch:
 
 ```powershell
 docker compose down -v
-docker compose up -d mysql adminer
+docker compose up -d --build
 ```
 
 ---
@@ -229,6 +249,9 @@ SHOW GRANTS FOR 'powerbi_reader'@'%';
 
 **Adminer** (browser UI): http://localhost:8080. Use System `MySQL`, Server
 `mysql`, and the `etl_user` credentials from `.env`.
+
+**Mock API:** `Invoke-RestMethod http://localhost:8000/health` returns
+`status: ok`. Interactive docs are at http://localhost:8000/docs.
 
 ---
 
@@ -314,9 +337,9 @@ RETURN
 
 | Phase | Scope | Status |
 |---|---|---|
-| 1 | Docker Compose, project skeleton, environment config | ✅ Done (refinements pending) |
+| 1 | Docker Compose, project skeleton, environment config | ✅ Done |
 | 2 | Databases, staging/control/warehouse DDL, `dim_date`, Power BI user | ✅ Done (SCD2 columns pending) |
-| 3 | Faker generators, dirty-data injection, mock orders API | 🚧 Generators done, API pending |
+| 3 | Faker generators, dirty-data injection, mock orders API | 🚧 Generators done, API serves `/health` only |
 | 4 | Ingestion package (extract, validate, parse, load, archive) | ⏳ Planned |
 | 5 | Stored-procedure ETL (dimensions, SCD2, facts, watermarks) | ⏳ Planned |
 | 6 | Data quality engine and structured logging | ⏳ Planned |
