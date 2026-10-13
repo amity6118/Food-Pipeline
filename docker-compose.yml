@@ -1,0 +1,104 @@
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: food_order_mysql
+    restart: unless-stopped
+    ports:
+      - "${HOST_MYSQL_PORT:-3306}:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?Set MYSQL_ROOT_PASSWORD in .env}
+      MYSQL_DATABASE: ${CONTROL_DB:-food_control}
+      MYSQL_USER: ${MYSQL_USER:?Set MYSQL_USER in .env}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:?Set MYSQL_PASSWORD in .env}
+      POWERBI_USER: ${POWERBI_USER:?Set POWERBI_USER in .env}
+      POWERBI_PASSWORD: ${POWERBI_PASSWORD:?Set POWERBI_PASSWORD in .env}
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./sql/init:/docker-entrypoint-initdb.d:ro
+    command: >
+      --default-authentication-plugin=mysql_native_password
+      --character-set-server=utf8mb4
+      --collation-server=utf8mb4_unicode_ci
+      --sql_mode=STRICT_TRANS_TABLES,NO_ENGINE_SUBSTITUTION
+      --log-bin-trust-function-creators=1
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -u root -p$${MYSQL_ROOT_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 25s
+    networks:
+      - pipeline_net
+
+  mock_api:
+    build:
+      context: .
+      dockerfile: docker/mock_api/Dockerfile
+    container_name: food_order_mock_api
+    restart: unless-stopped
+    ports:
+      - "${HOST_MOCK_API_PORT:-8000}:8000"
+    environment:
+      - MOCK_API_HOST=0.0.0.0
+      - MOCK_API_PORT=8000
+    volumes:
+      - ./src:/app/src:ro
+      - ./data:/app/data
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health')\""]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - pipeline_net
+
+  etl:
+    build:
+      context: .
+      dockerfile: docker/etl/Dockerfile
+    container_name: food_order_etl
+    restart: "no"
+    depends_on:
+      mysql:
+        condition: service_healthy
+      mock_api:
+        condition: service_healthy
+    env_file:
+      - .env
+    environment:
+      - MYSQL_HOST=mysql
+      - MYSQL_PORT=3306
+      - MOCK_API_BASE_URL=http://mock_api:8000
+      - PYTHONUNBUFFERED=1
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs
+      - ./src:/app/src
+      - ./sql:/app/sql
+      - ./tests:/app/tests
+      - ./run_pipeline.py:/app/run_pipeline.py
+    entrypoint: ["/app/docker/etl/entrypoint.sh"]
+    command: ["python", "run_pipeline.py", "--step", "all"]
+    networks:
+      - pipeline_net
+
+  adminer:
+    image: adminer:latest
+    container_name: food_order_adminer
+    restart: unless-stopped
+    ports:
+      - "${HOST_ADMINER_PORT:-8080}:8080"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - pipeline_net
+
+volumes:
+  mysql_data:
+    driver: local
+
+networks:
+  pipeline_net:
+    driver: bridge

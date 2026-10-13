@@ -1,0 +1,22 @@
+# Core Data Ingestion & Transformation
+pandas>=2.2.0
+SQLAlchemy>=2.0.28
+PyMySQL>=1.1.0
+cryptography>=42.0.5
+
+# Synthetic Data Generation
+Faker>=24.0.0
+
+# Mock API Server & Client
+fastapi>=0.110.0
+uvicorn>=0.29.0
+requests>=2.31.0
+pydantic>=2.6.4
+
+# Orchestration & Environment Configuration
+python-dotenv>=1.0.1
+APScheduler>=3.10.4
+
+# Testing & Quality Assurance
+pytest>=8.1.1
+pytest-mock>=3.14.0
