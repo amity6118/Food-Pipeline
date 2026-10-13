@@ -135,12 +135,12 @@ food-order-pipeline/
 │   │   └── 99_create_app_users.sh     # ETL + Power BI users from .env
 ├── src/
 │   ├── config.py               # all settings from environment variables
-│   ├── generator/              # Faker data generators + mock orders API
-│   ├── ingestion/              # extract · validate · parse · load
+│   ├── generator/              # seeded master-data snapshots, order stream, mock API
+│   ├── ingestion/              # sources · extract · validate · parse · load · file_mover · runner
 │   ├── processing/             # stored-procedure runner
 │   ├── quality/                # rule-driven DQ engine
 │   ├── orchestration/          # pipeline runner, scheduler, notifier
-│   └── utils/                  # DB engine, logging, connectivity check
+│   └── utils/                  # DB engine, logging, batch ids, job log, connectivity check
 ├── tests/
 ├── data/
 │   ├── landing/                # incoming files
@@ -208,7 +208,36 @@ docker compose logs etl
 Re-run the check at any time with
 `docker compose run --rm etl python -m src.utils.healthcheck`.
 
-### 4. Reset from scratch (optional)
+### 4. Generate and ingest a day of data
+
+```powershell
+# Drop the day's master-data CSVs into data/landing
+docker compose run --rm etl python -m src.generator --date 2026-10-12
+
+# Pull the day's orders from the mock API, then validate, parse and load every file into staging
+docker compose run --rm etl python -m src.ingestion --date 2026-10-12
+```
+
+```
+Batch B20261012
+  customers          LOADED   stg_customers=635
+  restaurants        LOADED   stg_restaurants=55
+  menu_items         LOADED   stg_menu_items=322
+  delivery_partners  LOADED   stg_delivery_partners=77
+  payment_methods    LOADED   stg_payment_methods=6
+  orders             LOADED   stg_orders=294, stg_order_items=603
+```
+
+Loaded files move to `data/archive/<date>/`. A file that fails validation
+(empty, unreadable or missing columns) moves to `data/error/<date>/` with a
+`.error.txt` reason, while the other files still load, and the command exits
+with code 1. Running the same date again replaces that batch: staging row
+counts stay the same. Each file is logged as a job in `food_control.etl_job_log`.
+
+The mock API can also be browsed directly, e.g.
+http://localhost:8000/orders?date=2026-10-12&page=1&page_size=50.
+
+### 5. Reset from scratch (optional)
 
 The init scripts only run on the first boot of an empty volume. To rebuild the
 databases from scratch:
@@ -346,8 +375,8 @@ RETURN
 |---|---|---|
 | 1 | Docker Compose, project skeleton, environment config | ✅ Done |
 | 2 | Databases, staging/control/warehouse DDL, `dim_date`, cleansing functions, DQ rule catalogue, Power BI user | ✅ Done |
-| 3 | Faker generators, dirty-data injection, mock orders API | 🚧 Generators done, API serves `/health` only |
-| 4 | Ingestion package (extract, validate, parse, load, archive) | ⏳ Planned |
+| 3 | Faker generators, dirty-data injection, mock orders API | ✅ Done |
+| 4 | Ingestion package (extract, validate, parse, load, archive) | ✅ Done |
 | 5 | Stored-procedure ETL (dimensions, SCD2, facts, watermarks) | ⏳ Planned |
 | 6 | Data quality engine and structured logging | ⏳ Planned |
 | 7 | `run_pipeline.py` orchestrator, scheduler, failure alerts | ⏳ Planned |

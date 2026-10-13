@@ -220,9 +220,10 @@ food-order-pipeline/
 │       reconciliation.sql           # staging ↔ DW row counts
 ├── src/
 │   ├── config.py
-│   ├── utils/         db.py  logger.py  batch.py
-│   ├── generator/     master_data.py  orders.py  mock_api.py
-│   ├── ingestion/     extract.py  validate.py  parse.py  load.py  file_mover.py
+│   ├── utils/         db.py  logger.py  batch.py  job_log.py  healthcheck.py
+│   ├── generator/     reference_data.py  master_data.py  orders.py  mock_api.py
+│   ├── ingestion/     sources.py  extract.py  validate.py  parse.py  load.py
+│   │                  file_mover.py  runner.py
 │   ├── processing/    procedure_runner.py
 │   ├── quality/       dq_engine.py
 │   └── orchestration/ pipeline.py  scheduler.py  notifier.py
