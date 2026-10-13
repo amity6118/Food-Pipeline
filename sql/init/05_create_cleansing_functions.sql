@@ -13,6 +13,9 @@ DROP FUNCTION IF EXISTS fn_is_blank;
 DROP FUNCTION IF EXISTS fn_to_decimal;
 DROP FUNCTION IF EXISTS fn_to_int;
 DROP FUNCTION IF EXISTS fn_to_datetime;
+DROP FUNCTION IF EXISTS fn_to_flag;
+DROP FUNCTION IF EXISTS fn_clean_phone;
+DROP FUNCTION IF EXISTS fn_title_case;
 
 DELIMITER $$
 
@@ -92,6 +95,58 @@ BEGIN
     END IF;
 
     RETURN TIMESTAMP(v_month_start + INTERVAL (v_day - 1) DAY, MAKETIME(v_hour, v_minute, v_second));
+END$$
+
+-- Yes/no style values ("1", "true", "Y", ...) -> 1 / 0; NULL if unrecognised.
+CREATE FUNCTION fn_to_flag(p_value VARCHAR(50))
+RETURNS TINYINT
+DETERMINISTIC NO SQL
+BEGIN
+    DECLARE v_text VARCHAR(255) DEFAULT UPPER(fn_clean_text(p_value));
+    IF v_text IN ('1', 'TRUE', 'T', 'YES', 'Y') THEN
+        RETURN 1;
+    ELSEIF v_text IN ('0', 'FALSE', 'F', 'NO', 'N') THEN
+        RETURN 0;
+    END IF;
+    RETURN NULL;
+END$$
+
+-- Indian mobile number in any common format -> "+91-XXXXXXXXXX"; NULL if invalid.
+CREATE FUNCTION fn_clean_phone(p_value VARCHAR(100))
+RETURNS VARCHAR(20)
+DETERMINISTIC NO SQL
+BEGIN
+    DECLARE v_digits VARCHAR(255) DEFAULT REGEXP_REPLACE(COALESCE(p_value, ''), '[^0-9]', '');
+    IF CHAR_LENGTH(v_digits) = 12 AND LEFT(v_digits, 2) = '91' THEN
+        SET v_digits = SUBSTRING(v_digits, 3);
+    END IF;
+    IF v_digits REGEXP '^[6-9][0-9]{9}$' THEN
+        RETURN CONCAT('+91-', v_digits);
+    END IF;
+    RETURN NULL;
+END$$
+
+-- "FAST FOOD" / "fast food" -> "Fast Food" (after fn_clean_text).
+CREATE FUNCTION fn_title_case(p_value VARCHAR(255))
+RETURNS VARCHAR(255)
+DETERMINISTIC NO SQL
+BEGIN
+    DECLARE v_text VARCHAR(255) DEFAULT LOWER(fn_clean_text(p_value));
+    DECLARE v_result VARCHAR(255) DEFAULT '';
+    DECLARE v_char VARCHAR(1);              -- VARCHAR, not CHAR: CHAR would drop the spaces
+    DECLARE v_previous VARCHAR(1) DEFAULT ' ';
+    DECLARE v_position INT DEFAULT 1;
+
+    IF v_text IS NULL THEN
+        RETURN NULL;
+    END IF;
+    WHILE v_position <= CHAR_LENGTH(v_text) DO
+        SET v_char = SUBSTRING(v_text, v_position, 1);
+        SET v_result = CONCAT(v_result, IF(v_previous IN (' ', '-', '('), UPPER(v_char), v_char));
+        SET v_previous = v_char;
+        SET v_position = v_position + 1;
+    END WHILE;
+    RETURN v_result;
 END$$
 
 DELIMITER ;

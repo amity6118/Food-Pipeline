@@ -98,3 +98,13 @@ CREATE TABLE IF NOT EXISTS pipeline_metadata (
     description     VARCHAR(255) NULL,
     updated_at      DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB;
+
+-- ----------------------------------------------------------------------------
+-- Batches held back by a failed staging DQ check. The load procedures skip
+-- held batches; the hold is released when the batch passes staging DQ again.
+-- ----------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS etl_batch_hold (
+    batch_id   VARCHAR(64)  PRIMARY KEY,
+    reason     VARCHAR(500) NOT NULL,
+    held_at    DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB;

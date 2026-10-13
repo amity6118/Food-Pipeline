@@ -17,6 +17,7 @@ USE food_control;
 INSERT INTO pipeline_metadata (metadata_key, metadata_value, description) VALUES
     ('pipeline_version',                '1.0.0', 'ETL pipeline release version'),
     ('last_successful_batch_id',        'NONE',  'Batch id of the last fully successful run'),
+    ('delivery_sla_minutes',            '45',    'Deliveries slower than this are flagged is_late'),
     ('watermark.stg_customers',         '0',     'Last stg_id processed by sp_load_dim_customer'),
     ('watermark.stg_restaurants',       '0',     'Last stg_id processed by sp_load_dim_restaurant'),
     ('watermark.stg_menu_items',        '0',     'Last stg_id processed by sp_load_dim_menu_item'),
