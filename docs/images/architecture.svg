@@ -67,9 +67,7 @@
   <!-- Clean Background -->
   <rect class="bg" width="1800" height="1020" rx="16"/>
 
-  <!-- ====================================================================== -->
-  <!-- 1. ORCHESTRATION & CONTROL (TOP CONTAINER)                             -->
-  <!-- ====================================================================== -->
+  <!-- 1. ORCHESTRATION AND CONTROL (TOP CONTAINER) -->
   <g id="orchestration-control">
     <!-- Outer Card -->
     <rect x="290" y="25" width="1140" height="135" rx="10" fill="#f4f8fe" stroke="#3b82f6" stroke-width="1.8" filter="url(#header-shadow)"/>
@@ -81,17 +79,14 @@
 
     <!-- Item 1: Task Scheduler -->
     <g transform="translate(330, 78)">
-      <!-- Calendar Icon with Clock -->
       <g transform="translate(0, 4) scale(0.85)">
         <rect x="2" y="8" width="38" height="34" rx="5" fill="#ffffff" stroke="#1d63d2" stroke-width="3"/>
         <path d="M 2 16 L 40 16" stroke="#1d63d2" stroke-width="3"/>
         <line x1="11" y1="3" x2="11" y2="11" stroke="#1d63d2" stroke-width="3.5" stroke-linecap="round"/>
         <line x1="31" y1="3" x2="31" y2="11" stroke="#1d63d2" stroke-width="3.5" stroke-linecap="round"/>
-        <!-- Small grid lines -->
         <rect x="8" y="22" width="6" height="5" rx="1" fill="#1d63d2"/>
         <rect x="18" y="22" width="6" height="5" rx="1" fill="#1d63d2"/>
         <rect x="8" y="31" width="6" height="5" rx="1" fill="#1d63d2"/>
-        <!-- Mini Clock -->
         <circle cx="34" cy="34" r="12" fill="#ffffff" stroke="#1d63d2" stroke-width="3"/>
         <polyline points="34,27 34,34 38,37" fill="none" stroke="#1d63d2" stroke-width="2.5" stroke-linecap="round"/>
       </g>
@@ -101,12 +96,9 @@
 
     <!-- Item 2: Job Orchestration -->
     <g transform="translate(710, 78)">
-      <!-- Cog/Gears Icon -->
       <g transform="translate(0, 6) scale(0.82)">
-        <!-- Big Gear -->
         <path d="M 22 8 L 24 8 L 25 12 L 29 13 L 32 10 L 34 11 L 34 15 L 38 17 L 41 15 L 43 17 L 41 21 L 43 25 L 47 26 L 47 28 L 43 30 L 41 33 L 43 37 L 41 39 L 38 37 L 34 39 L 34 43 L 32 44 L 29 41 L 25 42 L 24 46 L 22 46 L 20 42 L 16 41 L 13 44 L 11 43 L 12 39 L 8 37 L 5 39 L 3 37 L 5 33 L 3 30 L 0 28 L 0 26 L 3 25 L 5 21 L 3 17 L 5 15 L 8 17 L 12 15 L 11 11 L 13 10 L 16 13 L 20 12 Z" fill="#0066cc"/>
         <circle cx="23" cy="27" r="8" fill="#ffffff"/>
-        <!-- Small Gear -->
         <circle cx="38" cy="14" r="9" fill="#0284c7"/>
         <circle cx="38" cy="14" r="4" fill="#ffffff"/>
       </g>
@@ -114,9 +106,8 @@
       <text x="50" y="44" class="card-label-sub">(Workflow Management)</text>
     </g>
 
-    <!-- Item 3: Monitoring & Alerts -->
+    <!-- Item 3: Monitoring and Alerts -->
     <g transform="translate(1085, 78)">
-      <!-- Screen with Pulse/Alert Icon -->
       <g transform="translate(0, 6) scale(0.85)">
         <rect x="2" y="4" width="44" height="32" rx="4" fill="#ffffff" stroke="#0066cc" stroke-width="3"/>
         <path d="M 8 23 L 16 23 L 21 13 L 27 28 L 32 19 L 38 19" fill="none" stroke="#0066cc" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
@@ -128,51 +119,32 @@
     </g>
   </g>
 
-  <!-- ====================================================================== -->
-  <!-- DOTTED BLUE CONTROL LINES (FROM TOP DOWN TO ALL 5 PROCESSING BOXES)    -->
-  <!-- ====================================================================== -->
+  <!-- DOTTED BLUE CONTROL LINES -->
   <g id="control-flow-lines">
-    <!-- Horizontal trunk line -->
     <path d="M 400 160 L 400 200 L 1560 200" fill="none" stroke="#1d63d2" stroke-width="2" stroke-dasharray="6 5"/>
     <path d="M 860 160 L 860 200" fill="none" stroke="#1d63d2" stroke-width="2" stroke-dasharray="6 5"/>
 
-    <!-- Downward drop arrows -->
-    <!-- Down to Ingestion (x=400) -->
     <path d="M 400 200 L 400 240" fill="none" stroke="#1d63d2" stroke-width="2" stroke-dasharray="6 5" marker-end="url(#arrow-blue)"/>
-    <!-- Down to Staging (x=675) -->
     <path d="M 675 200 L 675 240" fill="none" stroke="#1d63d2" stroke-width="2" stroke-dasharray="6 5" marker-end="url(#arrow-blue)"/>
-    <!-- Down to Processing ETL (x=980) -->
     <path d="M 980 200 L 980 240" fill="none" stroke="#1d63d2" stroke-width="2" stroke-dasharray="6 5" marker-end="url(#arrow-blue)"/>
-    <!-- Down to Data Warehouse (x=1285) -->
     <path d="M 1285 200 L 1285 240" fill="none" stroke="#1d63d2" stroke-width="2" stroke-dasharray="6 5" marker-end="url(#arrow-blue)"/>
-    <!-- Down to Reporting BI (x=1560) -->
     <path d="M 1560 200 L 1560 240" fill="none" stroke="#1d63d2" stroke-width="2" stroke-dasharray="6 5" marker-end="url(#arrow-blue)"/>
   </g>
 
-  <!-- ====================================================================== -->
-  <!-- 2. MAIN HORIZONTAL PIPELINE                                            -->
-  <!-- ====================================================================== -->
-
-  <!-- ---------------------------------------------------------------------- -->
-  <!-- COLUMN 1: SOURCES                                                      -->
-  <!-- ---------------------------------------------------------------------- -->
+  <!-- COLUMN 1: SOURCES -->
   <g id="col-sources" transform="translate(30, 240)">
     <rect x="0" y="0" width="205" height="520" rx="10" fill="#ffffff" stroke="#c4cbd5" stroke-width="1.8" filter="url(#card-shadow)"/>
-    <!-- Header -->
     <path d="M 0 10 Q 0 0 10 0 L 195 0 Q 205 0 205 10 L 205 50 L 0 50 Z" fill="#edf0f4"/>
     <line x1="0" y1="50" x2="205" y2="50" stroke="#c4cbd5" stroke-width="1.2"/>
     <text x="102" y="32" class="col-header-text" fill="#1e293b">SOURCES</text>
 
-    <!-- Source Items -->
-    <!-- 1. Website / Food Platforms -->
+    <!-- 1. Website Food Platforms -->
     <g transform="translate(18, 75)">
-      <!-- Browser with Globe -->
       <g transform="translate(0, 0) scale(0.85)">
         <rect x="0" y="2" width="38" height="30" rx="4" fill="#ffffff" stroke="#0284c7" stroke-width="2.5"/>
         <line x1="0" y1="10" x2="38" y2="10" stroke="#0284c7" stroke-width="2"/>
         <circle cx="5" cy="6" r="1.5" fill="#0284c7"/>
         <circle cx="10" cy="6" r="1.5" fill="#0284c7"/>
-        <!-- Globe in lower right -->
         <circle cx="28" cy="24" r="10" fill="#ffffff" stroke="#0284c7" stroke-width="2.5"/>
         <ellipse cx="28" cy="24" rx="4" ry="10" fill="none" stroke="#0284c7" stroke-width="1.8"/>
         <line x1="18" y1="24" x2="38" y2="24" stroke="#0284c7" stroke-width="1.8"/>
@@ -181,7 +153,7 @@
       <text x="44" y="32" class="bullet-text" font-weight="600">Food Platforms</text>
     </g>
 
-    <!-- 2. Website / Food Platforms (Second Platform) -->
+    <!-- 2. Website Food Platforms 2 -->
     <g transform="translate(18, 145)">
       <g transform="translate(0, 0) scale(0.85)">
         <rect x="0" y="2" width="38" height="30" rx="4" fill="#ffffff" stroke="#0284c7" stroke-width="2.5"/>
@@ -196,14 +168,12 @@
       <text x="44" y="32" class="bullet-text" font-weight="600">Food Platforms</text>
     </g>
 
-    <!-- Vertical Dots -->
     <circle cx="102" cy="215" r="2.5" fill="#64748b"/>
     <circle cx="102" cy="227" r="2.5" fill="#64748b"/>
     <circle cx="102" cy="239" r="2.5" fill="#64748b"/>
 
-    <!-- 3. CSV / Files -->
+    <!-- 3. CSV Files -->
     <g transform="translate(18, 270)">
-      <!-- CSV Green Doc -->
       <g transform="translate(2, 2) scale(0.85)">
         <path d="M 0 0 L 22 0 L 32 10 L 32 38 L 0 38 Z" fill="#1b7a43"/>
         <path d="M 22 0 L 22 10 L 32 10 Z" fill="#86efac"/>
@@ -214,7 +184,6 @@
 
     <!-- 4. APIs -->
     <g transform="translate(18, 345)">
-      <!-- Cloud API Icon -->
       <g transform="translate(0, 0) scale(0.85)">
         <path d="M 10 24 A 8 8 0 0 1 20 14 A 12 12 0 0 1 36 18 A 8 8 0 0 1 36 30 L 10 30 A 6 6 0 0 1 10 24 Z" fill="#0284c7"/>
         <circle cx="23" cy="22" r="5" fill="#ffffff"/>
@@ -225,7 +194,6 @@
 
     <!-- 5. Scheduled Jobs -->
     <g transform="translate(18, 420)">
-      <!-- Purple Clock Icon -->
       <g transform="translate(0, 2) scale(0.85)">
         <circle cx="18" cy="18" r="15" fill="#ffffff" stroke="#7928ca" stroke-width="3"/>
         <polyline points="18,10 18,18 24,18" fill="none" stroke="#7928ca" stroke-width="3" stroke-linecap="round"/>
@@ -234,91 +202,68 @@
     </g>
   </g>
 
-  <!-- Green Flow Arrow: Sources -> Ingestion -->
+  <!-- Green Flow Arrow: Sources to Ingestion -->
   <line x1="240" y1="500" x2="280" y2="500" stroke="#1b7a43" stroke-width="4.5" marker-end="url(#arrow-green)"/>
 
-  <!-- ---------------------------------------------------------------------- -->
-  <!-- COLUMN 2: DATA INGESTION                                               -->
-  <!-- ---------------------------------------------------------------------- -->
+  <!-- COLUMN 2: DATA INGESTION -->
   <g id="col-ingestion" transform="translate(290, 240)">
     <rect x="0" y="0" width="220" height="520" rx="10" fill="#ffffff" stroke="#52b788" stroke-width="1.8" filter="url(#card-shadow)"/>
-    <!-- Header -->
     <path d="M 0 10 Q 0 0 10 0 L 210 0 Q 220 0 220 10 L 220 50 L 0 50 Z" fill="#eaf7ed"/>
     <line x1="0" y1="50" x2="220" y2="50" stroke="#52b788" stroke-width="1.2"/>
     <text x="110" y="32" class="col-header-text" fill="#1b7a43">DATA INGESTION</text>
 
-    <!-- Subtitle -->
     <text x="110" y="85" class="sub-title-text">Ingestion Layer</text>
 
     <!-- Authentic Python Logo -->
     <g transform="translate(70, 115) scale(1.35)">
-      <!-- Blue Snake (Top-Left) -->
       <path d="M 29.8 0 C 13.6 0 14.7 7 14.7 7 L 14.7 14.3 L 30.2 14.3 L 30.2 16.5 L 9.1 16.5 C 9.1 16.5 0 15.5 0 31.6 C 0 47.8 7.9 46.8 7.9 46.8 L 12.6 46.8 L 12.6 40.2 C 12.6 40.2 12.2 32.6 19.9 32.6 L 35.3 32.6 C 35.3 32.6 42.6 32.8 42.6 25.5 L 42.6 7 C 42.6 7 43.9 0 29.8 0 Z M 21.6 4.9 A 2.3 2.3 0 1 1 21.6 9.5 A 2.3 2.3 0 1 1 21.6 4.9 Z" fill="#387eb8"/>
-      <!-- Yellow Snake (Bottom-Right) -->
       <path d="M 30.2 60 C 46.4 60 45.3 53 45.3 53 L 45.3 45.7 L 29.8 45.7 L 29.8 43.5 L 50.9 43.5 C 50.9 43.5 60 44.5 60 28.4 C 60 12.2 52.1 13.2 52.1 13.2 L 47.4 13.2 L 47.4 19.8 C 47.4 19.8 47.8 27.4 40.1 27.4 L 24.7 27.4 C 24.7 27.4 17.4 27.2 17.4 34.5 L 17.4 53 C 17.4 53 16.1 60 30.2 60 Z M 38.4 55.1 A 2.3 2.3 0 1 1 38.4 50.5 A 2.3 2.3 0 1 1 38.4 55.1 Z" fill="#ffe873"/>
     </g>
 
     <text x="110" y="232" class="sub-title-text" font-weight="700">Python Ingestion</text>
 
-    <!-- Bullets -->
     <g transform="translate(30, 275)">
-      <!-- Bullet 1 -->
       <circle cx="8" cy="10" r="3.5" fill="#1b7a43"/>
       <text x="22" y="14" class="bullet-text">Extract Data</text>
 
-      <!-- Bullet 2 -->
       <circle cx="8" cy="45" r="3.5" fill="#1b7a43"/>
       <text x="22" y="49" class="bullet-text">Validate</text>
 
-      <!-- Bullet 3 -->
       <circle cx="8" cy="80" r="3.5" fill="#1b7a43"/>
       <text x="22" y="84" class="bullet-text">Parse</text>
 
-      <!-- Bullet 4 -->
       <circle cx="8" cy="115" r="3.5" fill="#1b7a43"/>
       <text x="22" y="119" class="bullet-text">Load to Staging</text>
     </g>
   </g>
 
-  <!-- Green Flow Arrow: Ingestion -> Staging -->
+  <!-- Green Flow Arrow: Ingestion to Staging -->
   <line x1="515" y1="500" x2="555" y2="500" stroke="#1b7a43" stroke-width="4.5" marker-end="url(#arrow-green)"/>
 
-  <!-- ---------------------------------------------------------------------- -->
-  <!-- COLUMN 3: STAGING LAYER                                                -->
-  <!-- ---------------------------------------------------------------------- -->
+  <!-- COLUMN 3: STAGING LAYER -->
   <g id="col-staging" transform="translate(565, 240)">
     <rect x="0" y="0" width="220" height="520" rx="10" fill="#ffffff" stroke="#52b788" stroke-width="1.8" filter="url(#card-shadow)"/>
-    <!-- Header -->
     <path d="M 0 10 Q 0 0 10 0 L 210 0 Q 220 0 220 10 L 220 50 L 0 50 Z" fill="#eaf7ed"/>
     <line x1="0" y1="50" x2="220" y2="50" stroke="#52b788" stroke-width="1.2"/>
     <text x="110" y="32" class="col-header-text" fill="#1b7a43">STAGING LAYER</text>
 
-    <!-- Subtitle -->
     <text x="110" y="85" class="sub-title-text">Staging MySQL</text>
     <text x="110" y="105" class="sub-title-text">Database</text>
 
     <!-- 3D MySQL Cylinder -->
     <g transform="translate(68, 125)">
-      <!-- Main Cylinder body -->
       <rect x="0" y="18" width="84" height="60" fill="url(#db-grad)" rx="4"/>
-      <!-- Top Cap -->
       <ellipse cx="42" cy="18" rx="42" ry="16" fill="url(#db-grad-light)"/>
       <ellipse cx="42" cy="18" rx="42" ry="16" fill="none" stroke="#38bdf8" stroke-width="1.2"/>
-      <!-- Ring 1 -->
       <path d="M 0 48 A 42 16 0 0 0 84 48" fill="none" stroke="#0284c7" stroke-width="2.5"/>
-      <!-- Ring 2 -->
       <path d="M 0 78 A 42 16 0 0 0 84 78" fill="none" stroke="#0284c7" stroke-width="2.5"/>
-      <!-- Bottom Lip -->
       <ellipse cx="42" cy="78" rx="42" ry="16" fill="none" stroke="#003e54" stroke-width="1.5"/>
 
-      <!-- Stylized MySQL Dolphin vector -->
       <path d="M 28 52 C 26 38 40 32 50 36 C 58 40 60 48 56 56 C 52 50 48 46 44 48 C 38 52 35 60 30 64 C 32 58 35 55 28 52 Z" fill="#ffffff" opacity="0.95"/>
       <circle cx="51" cy="40" r="1.5" fill="#005573"/>
-      <!-- Text label -->
       <text x="42" y="70" font-family="-apple-system, sans-serif" font-size="14" font-weight="800" fill="#ffffff" text-anchor="middle" letter-spacing="0.5">MySQL</text>
     </g>
 
-    <!-- Bullets -->
     <g transform="translate(30, 275)">
       <circle cx="8" cy="10" r="3.5" fill="#1b7a43"/>
       <text x="22" y="14" class="bullet-text">Raw Tables</text>
@@ -334,15 +279,12 @@
     </g>
   </g>
 
-  <!-- Green Flow Arrow: Staging -> Processing -->
+  <!-- Green Flow Arrow: Staging to Processing -->
   <line x1="790" y1="500" x2="830" y2="500" stroke="#1b7a43" stroke-width="4.5" marker-end="url(#arrow-green)"/>
 
-  <!-- ---------------------------------------------------------------------- -->
-  <!-- COLUMN 4: PROCESSING LAYER (ETL)                                       -->
-  <!-- ---------------------------------------------------------------------- -->
+  <!-- COLUMN 4: PROCESSING LAYER (ETL) -->
   <g id="col-processing" transform="translate(840, 240)">
     <rect x="0" y="0" width="280" height="520" rx="10" fill="#ffffff" stroke="#52b788" stroke-width="1.8" filter="url(#card-shadow)"/>
-    <!-- Header -->
     <path d="M 0 10 Q 0 0 10 0 L 270 0 Q 280 0 280 10 L 280 50 L 0 50 Z" fill="#eaf7ed"/>
     <line x1="0" y1="50" x2="280" y2="50" stroke="#52b788" stroke-width="1.2"/>
     <text x="140" y="32" class="col-header-text" fill="#1b7a43">PROCESSING LAYER (ETL)</text>
@@ -353,7 +295,6 @@
     <text x="140" y="113" font-family="-apple-system, sans-serif" font-size="11.5" font-weight="500" fill="#dbeafe" text-anchor="middle">(Insert, Update, Delete</text>
     <text x="140" y="126" font-family="-apple-system, sans-serif" font-size="11.5" font-weight="500" fill="#dbeafe" text-anchor="middle">with Job Tracking)</text>
 
-    <!-- Down arrow 1 -->
     <line x1="140" y1="135" x2="140" y2="152" stroke="#0052cc" stroke-width="2.5" marker-end="url(#arrow-etl-down)"/>
 
     <!-- Middle Card: Data Transformations -->
@@ -374,10 +315,9 @@
       <text x="18" y="88" class="bullet-text">Surrogate Keys</text>
     </g>
 
-    <!-- Down arrow 2 -->
     <line x1="140" y1="316" x2="140" y2="333" stroke="#0052cc" stroke-width="2.5" marker-end="url(#arrow-etl-down)"/>
 
-    <!-- Bottom Card: Job Tracking & Logging -->
+    <!-- Bottom Card: Job Tracking and Logging -->
     <rect x="18" y="340" width="244" height="150" rx="6" fill="#ffffff" stroke="#cdd5df" stroke-width="1.5"/>
     <text x="140" y="366" font-family="-apple-system, sans-serif" font-size="14.5" font-weight="700" fill="#0052cc" text-anchor="middle">Job Tracking &amp; Logging</text>
 
@@ -396,20 +336,16 @@
     </g>
   </g>
 
-  <!-- Green Flow Arrow: Processing -> Warehouse -->
+  <!-- Green Flow Arrow: Processing to Warehouse -->
   <line x1="1125" y1="500" x2="1165" y2="500" stroke="#1b7a43" stroke-width="4.5" marker-end="url(#arrow-green)"/>
 
-  <!-- ---------------------------------------------------------------------- -->
-  <!-- COLUMN 5: DATA WAREHOUSE                                               -->
-  <!-- ---------------------------------------------------------------------- -->
+  <!-- COLUMN 5: DATA WAREHOUSE -->
   <g id="col-warehouse" transform="translate(1175, 240)">
     <rect x="0" y="0" width="220" height="520" rx="10" fill="#ffffff" stroke="#52b788" stroke-width="1.8" filter="url(#card-shadow)"/>
-    <!-- Header -->
     <path d="M 0 10 Q 0 0 10 0 L 210 0 Q 220 0 220 10 L 220 50 L 0 50 Z" fill="#eaf7ed"/>
     <line x1="0" y1="50" x2="220" y2="50" stroke="#52b788" stroke-width="1.2"/>
     <text x="110" y="32" class="col-header-text" fill="#1b7a43">DATA WAREHOUSE</text>
 
-    <!-- Subtitle -->
     <text x="110" y="85" class="sub-title-text">MySQL</text>
     <text x="110" y="105" class="sub-title-text">Data Warehouse</text>
 
@@ -422,13 +358,11 @@
       <path d="M 0 78 A 42 16 0 0 0 84 78" fill="none" stroke="#0284c7" stroke-width="2.5"/>
       <ellipse cx="42" cy="78" rx="42" ry="16" fill="none" stroke="#003e54" stroke-width="1.5"/>
 
-      <!-- Dolphin vector -->
       <path d="M 28 52 C 26 38 40 32 50 36 C 58 40 60 48 56 56 C 52 50 48 46 44 48 C 38 52 35 60 30 64 C 32 58 35 55 28 52 Z" fill="#ffffff" opacity="0.95"/>
       <circle cx="51" cy="40" r="1.5" fill="#005573"/>
       <text x="42" y="70" font-family="-apple-system, sans-serif" font-size="14" font-weight="800" fill="#ffffff" text-anchor="middle" letter-spacing="0.5">MySQL</text>
     </g>
 
-    <!-- Bullets -->
     <g transform="translate(30, 275)">
       <circle cx="8" cy="10" r="3.5" fill="#1b7a43"/>
       <text x="22" y="14" class="bullet-text">Star Schema</text>
@@ -445,38 +379,29 @@
     </g>
   </g>
 
-  <!-- Green Flow Arrow: Warehouse -> Reporting -->
+  <!-- Green Flow Arrow: Warehouse to Reporting -->
   <line x1="1400" y1="500" x2="1440" y2="500" stroke="#1b7a43" stroke-width="4.5" marker-end="url(#arrow-green)"/>
 
-  <!-- ---------------------------------------------------------------------- -->
-  <!-- COLUMN 6: REPORTING / BI                                               -->
-  <!-- ---------------------------------------------------------------------- -->
+  <!-- COLUMN 6: REPORTING / BI -->
   <g id="col-reporting" transform="translate(1450, 240)">
     <rect x="0" y="0" width="220" height="520" rx="10" fill="#ffffff" stroke="#52b788" stroke-width="1.8" filter="url(#card-shadow)"/>
-    <!-- Header -->
     <path d="M 0 10 Q 0 0 10 0 L 210 0 Q 220 0 220 10 L 220 50 L 0 50 Z" fill="#eaf7ed"/>
     <line x1="0" y1="50" x2="220" y2="50" stroke="#52b788" stroke-width="1.2"/>
     <text x="110" y="32" class="col-header-text" fill="#1b7a43">REPORTING / BI</text>
 
-    <!-- Subtitle -->
     <text x="110" y="85" class="sub-title-text">Power BI</text>
     <text x="110" y="105" class="sub-title-text">Dashboards</text>
 
-    <!-- Official Power BI Logo (3 gold rounded perspective bars) -->
+    <!-- Official Power BI Logo -->
     <g transform="translate(78, 128) scale(1.05)">
-      <!-- Left/Smallest bar -->
       <rect x="0" y="42" width="16" height="42" rx="4" fill="url(#pbi-bar1)"/>
-      <!-- Middle bar -->
       <rect x="20" y="22" width="16" height="62" rx="4" fill="url(#pbi-bar2)"/>
-      <!-- Right/Tallest bar -->
       <rect x="40" y="0" width="16" height="84" rx="4" fill="url(#pbi-bar3)"/>
-      <!-- Soft gloss highlights -->
       <path d="M 2 44 L 14 44" stroke="#ffffff" stroke-width="1.5" opacity="0.6"/>
       <path d="M 22 24 L 34 24" stroke="#ffffff" stroke-width="1.5" opacity="0.6"/>
       <path d="M 42 2 L 54 2" stroke="#ffffff" stroke-width="1.5" opacity="0.6"/>
     </g>
 
-    <!-- Bullets -->
     <g transform="translate(30, 275)">
       <circle cx="8" cy="10" r="3.5" fill="#1b7a43"/>
       <text x="22" y="14" class="bullet-text">KPIs &amp; Metrics</text>
@@ -492,43 +417,30 @@
     </g>
   </g>
 
-  <!-- ====================================================================== -->
-  <!-- DOTTED PURPLE MONITORING LINES (FROM DATA LAYERS DOWN TO BOTTOM)       -->
-  <!-- ====================================================================== -->
+  <!-- DOTTED PURPLE MONITORING LINES -->
   <g id="monitoring-flow-lines">
-    <!-- Connecting trunk from Ingestion, Staging, Processing, Warehouse -->
-    <!-- Upward arrow to Ingestion (x=400) -->
     <path d="M 400 815 L 400 765" fill="none" stroke="#7928ca" stroke-width="2" stroke-dasharray="6 5" marker-end="url(#arrow-purple)"/>
-    <!-- Upward arrow to Staging (x=675) -->
     <path d="M 675 815 L 675 765" fill="none" stroke="#7928ca" stroke-width="2" stroke-dasharray="6 5" marker-end="url(#arrow-purple)"/>
-    <!-- Upward arrow to Processing ETL (x=980) -->
     <path d="M 980 815 L 980 765" fill="none" stroke="#7928ca" stroke-width="2" stroke-dasharray="6 5" marker-end="url(#arrow-purple)"/>
-    <!-- Upward arrow to Warehouse (x=1285) -->
     <path d="M 1285 815 L 1285 765" fill="none" stroke="#7928ca" stroke-width="2" stroke-dasharray="6 5" marker-end="url(#arrow-purple)"/>
 
-    <!-- Horizontal link trunk -->
     <path d="M 400 815 L 1285 815" fill="none" stroke="#7928ca" stroke-width="2" stroke-dasharray="6 5"/>
 
-    <!-- Drops into Data Quality (x=380) and Monitoring (x=900) -->
     <path d="M 380 815 L 380 840" fill="none" stroke="#7928ca" stroke-width="2" stroke-dasharray="6 5"/>
     <path d="M 900 815 L 900 840" fill="none" stroke="#7928ca" stroke-width="2" stroke-dasharray="6 5"/>
   </g>
 
-  <!-- ====================================================================== -->
-  <!-- 3. BOTTOM CONTAINERS                                                   -->
-  <!-- ====================================================================== -->
+  <!-- 3. BOTTOM CONTAINERS -->
 
-  <!-- Container 1: DATA QUALITY & GOVERNANCE -->
+  <!-- Container 1: DATA QUALITY AND GOVERNANCE -->
   <g id="bottom-dq" transform="translate(180, 840)">
     <rect x="0" y="0" width="530" height="145" rx="10" fill="#fcfaff" stroke="#9d71e8" stroke-width="1.8" filter="url(#header-shadow)"/>
-    <!-- Header -->
     <path d="M 0 10 Q 0 0 10 0 L 520 0 Q 530 0 530 10 L 530 42 L 0 42 Z" fill="#f4edfc"/>
     <line x1="0" y1="42" x2="530" y2="42" stroke="#9d71e8" stroke-width="1.2"/>
     <text x="265" y="27" font-family="-apple-system, sans-serif" font-size="14.5" font-weight="700" fill="#6924b8" text-anchor="middle" letter-spacing="0.5">DATA QUALITY &amp; GOVERNANCE</text>
 
     <!-- Sub-item 1: Data Validation Rules -->
     <g transform="translate(30, 56)">
-      <!-- Shield Icon -->
       <g transform="translate(45, 0) scale(0.85)">
         <path d="M 18 2 L 34 8 L 34 22 C 34 32 18 40 18 40 C 18 40 2 32 2 22 L 2 8 Z" fill="#1d63d2"/>
         <polyline points="10,21 16,27 26,15" fill="none" stroke="#ffffff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
@@ -539,7 +451,6 @@
 
     <!-- Sub-item 2: Data Quality Checks -->
     <g transform="translate(205, 56)">
-      <!-- Clipboard Icon -->
       <g transform="translate(42, 0) scale(0.85)">
         <rect x="4" y="6" width="30" height="36" rx="3" fill="#ffffff" stroke="#1d63d2" stroke-width="2.5"/>
         <rect x="11" y="2" width="16" height="8" rx="2" fill="#1d63d2"/>
@@ -553,15 +464,11 @@
 
     <!-- Sub-item 3: Metadata Management -->
     <g transform="translate(370, 56)">
-      <!-- Database Disks Icon -->
       <g transform="translate(40, 0) scale(0.85)">
-        <!-- Tier 1 -->
         <rect x="2" y="8" width="32" height="12" fill="#1d63d2" rx="2"/>
         <ellipse cx="18" cy="8" rx="16" ry="6" fill="#38bdf8"/>
-        <!-- Tier 2 -->
         <rect x="2" y="20" width="32" height="12" fill="#1d63d2" rx="2"/>
         <ellipse cx="18" cy="20" rx="16" ry="6" fill="#38bdf8"/>
-        <!-- Tier 3 -->
         <rect x="2" y="32" width="32" height="12" fill="#1d63d2" rx="2"/>
         <ellipse cx="18" cy="32" rx="16" ry="6" fill="#38bdf8"/>
       </g>
@@ -570,17 +477,15 @@
     </g>
   </g>
 
-  <!-- Container 2: MONITORING & LOGGING -->
+  <!-- Container 2: MONITORING AND LOGGING -->
   <g id="bottom-monitoring" transform="translate(740, 840)">
     <rect x="0" y="0" width="570" height="145" rx="10" fill="#f7fbff" stroke="#5d9cec" stroke-width="1.8" filter="url(#header-shadow)"/>
-    <!-- Header -->
     <path d="M 0 10 Q 0 0 10 0 L 560 0 Q 570 0 570 10 L 570 42 L 0 42 Z" fill="#eaf2fc"/>
     <line x1="0" y1="42" x2="570" y2="42" stroke="#5d9cec" stroke-width="1.2"/>
     <text x="285" y="27" font-family="-apple-system, sans-serif" font-size="14.5" font-weight="700" fill="#104fb5" text-anchor="middle" letter-spacing="0.5">MONITORING &amp; LOGGING</text>
 
     <!-- Sub-item 1: Process Logs -->
     <g transform="translate(30, 56)">
-      <!-- Log file icon -->
       <g transform="translate(48, 0) scale(0.85)">
         <path d="M 4 2 L 24 2 L 34 12 L 34 40 L 4 40 Z" fill="#0066cc"/>
         <path d="M 24 2 L 24 12 L 34 12 Z" fill="#bae6fd"/>
@@ -594,7 +499,6 @@
 
     <!-- Sub-item 2: Error Logs -->
     <g transform="translate(225, 56)">
-      <!-- Alert Triangle Icon -->
       <g transform="translate(48, 0) scale(0.85)">
         <path d="M 18 4 L 35 34 L 1 34 Z" fill="#0066cc"/>
         <line x1="18" y1="14" x2="18" y2="24" stroke="#ffffff" stroke-width="3" stroke-linecap="round"/>
@@ -606,10 +510,8 @@
 
     <!-- Sub-item 3: Pipeline Metrics -->
     <g transform="translate(415, 56)">
-      <!-- Metrics monitor icon -->
       <g transform="translate(45, 0) scale(0.85)">
         <rect x="2" y="4" width="40" height="28" rx="3" fill="#ffffff" stroke="#0066cc" stroke-width="2.5"/>
-        <!-- Tiny bars -->
         <rect x="8" y="20" width="5" height="8" fill="#0066cc"/>
         <rect x="16" y="14" width="5" height="14" fill="#0066cc"/>
         <rect x="24" y="10" width="5" height="18" fill="#0066cc"/>
@@ -639,7 +541,7 @@
       <text x="70" y="4" class="bullet-text" font-weight="600">Control Flow</text>
     </g>
 
-    <!-- Legend Item 3: Logging / Monitoring Flow -->
+    <!-- Legend Item 3: Logging Monitoring Flow -->
     <g transform="translate(35, 118)">
       <line x1="0" y1="0" x2="45" y2="0" stroke="#7928ca" stroke-width="2.5" stroke-dasharray="6 4" marker-end="url(#arrow-purple)"/>
       <text x="70" y="4" class="bullet-text" font-weight="600">Logging / Monitoring Flow</text>
