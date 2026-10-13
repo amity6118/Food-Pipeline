@@ -1,0 +1,542 @@
+<style>
+/* Layout: dark header band with filters -> 4 KPI cards -> trend line full width -> bar + scatter -> detail table */
+.fd {
+  --fd-accent: #1e40af;        /* deep blue: every series */
+  --fd-accent-soft: rgba(30, 64, 175, .12);
+  --fd-hi: #b45309;            /* highlight for key numbers (text) */
+  --fd-hi-fill: #f59e0b;       /* highlight for marks (weekend dots, top bar) */
+  --fd-head: #0f1b3d;          /* dark header band, both themes */
+  --fd-head-fg: #f3f5fb;
+  --fd-head-muted: #a9b4d4;
+  --fd-head-line: rgba(255, 255, 255, .14);
+  --fd-shadow: 0 1px 2px rgba(15, 27, 61, .06), 0 6px 18px rgba(15, 27, 61, .07);
+  --fd-radius: 14px;
+  font-family: var(--font-anthropic-sans);
+  color: var(--color-fg);
+  display: grid;
+  gap: var(--cds-gap-lg);
+  max-width: 1320px;
+  margin-inline: auto;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .fd {
+    --fd-accent: #7d9bff; --fd-accent-soft: rgba(125, 155, 255, .16);
+    --fd-hi: #fbbf24; --fd-hi-fill: #fbbf24; --fd-head: #0a1330;
+    --fd-shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 6px 18px rgba(0, 0, 0, .25);
+  }
+}
+:root[data-theme="dark"] .fd {
+  --fd-accent: #7d9bff; --fd-accent-soft: rgba(125, 155, 255, .16);
+  --fd-hi: #fbbf24; --fd-hi-fill: #fbbf24; --fd-head: #0a1330;
+  --fd-shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 6px 18px rgba(0, 0, 0, .25);
+}
+
+/* Header */
+.fd-head {
+  background: var(--fd-head); color: var(--fd-head-fg);
+  border-radius: var(--fd-radius); padding: var(--cds-pad-xl) var(--cds-pad-xl) var(--cds-pad-lg);
+  display: grid; gap: var(--cds-gap-lg); box-shadow: var(--fd-shadow);
+}
+.fd-eyebrow { margin: 0; font-size: var(--cds-font-size-caption); letter-spacing: .08em; text-transform: uppercase; color: var(--fd-head-muted); }
+.fd-head h1 { margin: .2rem 0 0; font-size: var(--cds-font-size-title); font-weight: 700; text-wrap: balance; }
+.fd-takeaway { margin: .5rem 0 0; max-width: 62ch; color: var(--fd-head-muted); line-height: 1.5; }
+.fd-takeaway .fd-num { color: var(--fd-head-fg); font-weight: 700; }
+.fd-filters { display: flex; flex-wrap: wrap; gap: var(--cds-gap-md); align-items: end; border-top: 1px solid var(--fd-head-line); padding-top: var(--cds-pad-md); }
+.fd-filter { display: grid; gap: .3rem; font-size: var(--cds-font-size-caption); color: var(--fd-head-muted); min-width: 0; }
+.fd-filter select, .fd-reset {
+  font: inherit; font-size: var(--cds-font-size-body); color: var(--fd-head-fg);
+  background: rgba(255, 255, 255, .08); border: 1px solid var(--fd-head-line);
+  border-radius: 10px; padding: .45rem .7rem; min-width: 10rem; max-width: 100%;
+}
+.fd-filter select option { color: #0f1b3d; background: #ffffff; }
+.fd-reset { min-width: 0; cursor: pointer; }
+.fd-filter select:focus-visible, .fd-reset:focus-visible, .fd-search:focus-visible, .fd-table th button:focus-visible { outline: 2px solid var(--fd-hi-fill); outline-offset: 2px; }
+.fd-reset:hover { background: rgba(255, 255, 255, .16); }
+
+/* Cards */
+.fd-card {
+  background: var(--color-panel); border: 1px solid var(--color-border-line);
+  border-radius: var(--fd-radius); padding: var(--cds-pad-lg); box-shadow: var(--fd-shadow);
+  min-width: 0; display: grid; gap: var(--cds-gap-sm); align-content: start;
+}
+.fd-card h2 { margin: 0; font-size: var(--cds-font-size-heading); font-weight: var(--cds-font-weight-medium); text-wrap: balance; line-height: 1.35; }
+.fd-card h2 .fd-num { color: var(--fd-hi); font-weight: 700; }
+.fd-note { margin: 0; color: var(--color-fg-muted); font-size: var(--cds-font-size-caption); }
+
+.fd-kpis { display: grid; gap: var(--cds-gap-md); grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr)); }
+.fd-kpi-label { margin: 0; font-size: var(--cds-font-size-caption); letter-spacing: .06em; text-transform: uppercase; color: var(--color-fg-muted); }
+.fd-kpi-value { margin: 0; font-size: 2.4rem; line-height: 1.1; font-weight: 700; font-variant-numeric: tabular-nums; color: var(--fd-accent); }
+.fd-delta { margin: 0; font-size: var(--cds-font-size-caption); font-variant-numeric: tabular-nums; display: flex; gap: .35rem; align-items: baseline; flex-wrap: wrap; }
+.fd-delta .fd-arrow { font-size: .85em; }
+.fd-delta.is-up .fd-arrow, .fd-delta.is-up .fd-change { color: var(--color-ok); font-weight: 700; }
+.fd-delta.is-down .fd-arrow, .fd-delta.is-down .fd-change { color: var(--color-bad); font-weight: 700; }
+.fd-delta .fd-vs { color: var(--color-fg-muted); }
+
+.fd-grid { display: grid; gap: var(--cds-gap-md); grid-template-columns: repeat(auto-fit, minmax(min(100%, 26rem), 1fr)); }
+.fd-chart { position: relative; min-height: 300px; }
+.fd-chart svg { display: block; overflow: visible; }
+.fd-axis text { fill: var(--color-fg-muted); font-size: 11px; }
+.fd-axis line, .fd-axis path { stroke: var(--cds-chart-axis); }
+.fd-gridline { stroke: var(--cds-chart-grid); stroke-width: 1; }
+.fd-label { fill: var(--color-fg); font-size: 12px; }
+.fd-label-muted { fill: var(--color-fg-muted); font-size: 11px; }
+.fd-tip {
+  position: absolute; pointer-events: none; z-index: 2; min-width: 9rem;
+  background: var(--cds-surface-popover); border: 1px solid var(--cds-border); border-radius: var(--cds-radius);
+  box-shadow: var(--cds-shadow-popover); padding: var(--cds-pad-xs) var(--cds-pad-sm);
+  font-size: var(--cds-font-size-caption); font-variant-numeric: tabular-nums; line-height: 1.5;
+}
+.fd-tip .fd-tip-head { color: var(--cds-text-secondary); }
+.fd-tip b { font-weight: 700; }
+.fd-legend { display: flex; gap: var(--cds-gap-md); flex-wrap: wrap; font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); }
+.fd-swatch { display: inline-block; width: .6rem; height: .6rem; border-radius: 50%; margin-right: .3rem; vertical-align: middle; }
+.fd-empty { margin: 0; color: var(--color-fg-muted); font-size: var(--cds-font-size-caption); }
+
+/* Table */
+.fd-table-tools { display: flex; gap: var(--cds-gap-md); align-items: center; flex-wrap: wrap; justify-content: space-between; }
+.fd-search {
+  font: inherit; color: var(--color-fg); background: var(--color-bg);
+  border: 1px solid var(--color-border-line); border-radius: 10px; padding: .45rem .7rem; width: min(100%, 18rem);
+}
+.fd-table-wrap { max-height: 28rem; overflow: auto; border-radius: 10px; border: 1px solid var(--color-border-line); }
+.fd-table { width: 100%; border-collapse: collapse; font-size: var(--cds-font-size-body); font-variant-numeric: tabular-nums; }
+.fd-table th { position: sticky; top: 0; background: var(--color-panel); z-index: 1; text-align: left; border-bottom: 1px solid var(--color-border-line); padding: 0; white-space: nowrap; }
+.fd-table th button { all: unset; box-sizing: border-box; display: block; width: 100%; padding: .55rem .75rem; cursor: pointer; font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); font-weight: var(--cds-font-weight-medium); }
+.fd-table th button::after { content: " ↕"; opacity: .35; }
+.fd-table th[aria-sort="ascending"] button::after { content: " ↑"; opacity: 1; color: var(--fd-accent); }
+.fd-table th[aria-sort="descending"] button::after { content: " ↓"; opacity: 1; color: var(--fd-accent); }
+.fd-table td { padding: .5rem .75rem; border-bottom: 1px solid var(--color-border-line); white-space: nowrap; }
+.fd-table tbody tr:hover td { background: var(--fd-accent-soft); }
+.fd-table .is-num { text-align: right; }
+.fd-table th.is-num button { text-align: right; }
+.fd-bar-cell { display: flex; align-items: center; gap: .5rem; justify-content: flex-end; }
+.fd-bar-cell i { display: block; height: .45rem; border-radius: 4px; background: var(--fd-accent); opacity: .75; }
+@media (max-width: 640px) { .fd-hide-narrow { display: none; } .fd-kpi-value { font-size: 2rem; } .fd-head { padding: var(--cds-pad-lg); } }
+
+[data-dash-source-state=refreshing] { opacity: .5; transition: opacity var(--cds-dur-slow); }
+[data-dash-source-state=empty] { color: transparent; }
+@media (prefers-reduced-motion: no-preference) {
+  .fd-card, .fd-head { animation: fd-rise var(--cds-dur-slow) var(--cds-ease-out) both; }
+  @keyframes fd-rise { from { transform: translateY(6px); opacity: .6; } to { transform: none; opacity: 1; } }
+}
+</style>
+
+<div class="fd">
+  <header class="fd-head" id="overview">
+    <div>
+      <p class="fd-eyebrow">Food delivery platform · operations</p>
+      <h1>Food Delivery Performance</h1>
+      <p class="fd-takeaway" id="takeaway">
+        Late deliveries cost <span class="fd-num dash-skeleton" id="tk-gap" data-source="kpi_change" data-field="rating_gap">—</span> stars of rating
+        (<span class="fd-num dash-skeleton" id="tk-late" data-source="kpis" data-field="rating_late">—</span> vs
+        <span class="fd-num dash-skeleton" id="tk-ontime" data-source="kpis" data-field="rating_on_time">—</span> on time),
+        so on-time delivery is the lever: <span class="fd-num dash-skeleton" id="tk-ot" data-source="kpis" data-field="on_time">—</span>
+        of orders arrive within the 45-minute SLA.
+      </p>
+    </div>
+    <div class="fd-filters" id="filters">
+      <label class="fd-filter" for="f-period">Date range
+        <select id="f-period">
+          <option value="7d">Last 7 days</option>
+          <option value="30d">Last 30 days</option>
+          <option value="90d">Last 90 days</option>
+          <option value="all">All data (since Jul 1)</option>
+        </select>
+      </label>
+      <label class="fd-filter" for="f-city">City
+        <select id="f-city" data-source="restaurants"></select>
+      </label>
+      <label class="fd-filter" for="f-cuisine">Cuisine
+        <select id="f-cuisine" data-source="restaurants"></select>
+      </label>
+      <button class="fd-reset" id="f-reset" type="button">Reset filters</button>
+    </div>
+  </header>
+
+  <section class="fd-kpis" id="kpis" aria-label="Headline figures">
+    <article class="fd-card" id="kpi-orders">
+      <p class="fd-kpi-label">Orders</p>
+      <p class="fd-kpi-value"><span class="dash-skeleton" data-kpi="orders" data-source="kpis" data-field="orders">—</span></p>
+      <p class="fd-delta" data-delta="orders"><span class="fd-arrow"></span><span class="fd-change" data-source="kpi_change" data-field="orders_change">—</span><span class="fd-vs"></span></p>
+      <p class="fd-note" data-window>—</p>
+    </article>
+    <article class="fd-card" id="kpi-gmv">
+      <p class="fd-kpi-label">GMV (delivered)</p>
+      <p class="fd-kpi-value"><span class="dash-skeleton" data-kpi="gmv" data-source="kpis" data-field="gmv">—</span></p>
+      <p class="fd-delta" data-delta="gmv"><span class="fd-arrow"></span><span class="fd-change" data-source="kpi_change" data-field="gmv_change">—</span><span class="fd-vs"></span></p>
+      <p class="fd-note" data-window>—</p>
+    </article>
+    <article class="fd-card" id="kpi-ontime">
+      <p class="fd-kpi-label">On-time delivery</p>
+      <p class="fd-kpi-value"><span class="dash-skeleton" data-kpi="on_time" data-source="kpis" data-field="on_time">—</span></p>
+      <p class="fd-delta" data-delta="on_time"><span class="fd-arrow"></span><span class="fd-change" data-source="kpi_change" data-field="on_time_change">—</span><span class="fd-vs"></span></p>
+      <p class="fd-note" data-window>—</p>
+    </article>
+    <article class="fd-card" id="kpi-rating">
+      <p class="fd-kpi-label">Average rating</p>
+      <p class="fd-kpi-value"><span class="dash-skeleton" data-kpi="avg_rating" data-source="kpis" data-field="avg_rating">—</span></p>
+      <p class="fd-delta" data-delta="avg_rating"><span class="fd-arrow"></span><span class="fd-change" data-source="kpi_change" data-field="rating_change">—</span><span class="fd-vs"></span></p>
+      <p class="fd-note" data-window>—</p>
+    </article>
+  </section>
+
+  <article class="fd-card" id="trend">
+    <h2>Weekends bring <span class="fd-num dash-skeleton" id="t-uplift" data-source="kpis" data-field="weekend_uplift">—</span> more orders per day than weekdays</h2>
+    <p class="fd-note">Orders per day. <span class="fd-legend" style="display:inline-flex"><span><span class="fd-swatch" style="background:var(--fd-accent)"></span>Weekday</span><span><span class="fd-swatch" style="background:var(--fd-hi-fill)"></span>Saturday / Sunday</span></span></p>
+    <div class="fd-chart dash-skeleton" id="chart-trend" data-source="daily"></div>
+  </article>
+
+  <div class="fd-grid">
+    <article class="fd-card" id="top10">
+      <h2><span class="fd-num dash-skeleton" id="b-top" data-source="restaurants" data-field="restaurant">—</span> leads with <span class="fd-num dash-skeleton" id="b-top-gmv" data-source="restaurants" data-field="gmv">—</span> GMV</h2>
+      <p class="fd-note">Top 10 restaurants by delivered GMV.</p>
+      <div class="fd-chart dash-skeleton" id="chart-top10" data-source="restaurants"></div>
+    </article>
+    <article class="fd-card" id="scatter">
+      <h2>Late orders average <span class="fd-num dash-skeleton" id="s-late" data-source="kpis" data-field="rating_late">—</span>★, on-time orders <span class="fd-num dash-skeleton" id="s-ontime" data-source="kpis" data-field="rating_on_time">—</span>★</h2>
+      <p class="fd-note">Each dot is a restaurant: on-time share vs average rating, sized by orders.</p>
+      <div class="fd-chart dash-skeleton" id="chart-scatter" data-source="restaurants"></div>
+    </article>
+  </div>
+
+  <article class="fd-card" id="detail">
+    <div class="fd-table-tools">
+      <div>
+        <h2>Restaurant detail</h2>
+        <p class="fd-note" id="table-count">—</p>
+      </div>
+      <input class="fd-search" id="t-search" type="search" placeholder="Search restaurant, city or cuisine" aria-label="Search restaurants">
+    </div>
+    <div class="fd-table-wrap">
+      <table class="fd-table" id="t-restaurants" data-source="restaurants" data-row-key="period,restaurant_id">
+        <thead><tr>
+          <th data-field="restaurant" data-col="restaurant"><button type="button">Restaurant</button></th>
+          <th data-field="city" data-col="city"><button type="button">City</button></th>
+          <th data-field="cuisine" data-col="cuisine" class="fd-hide-narrow"><button type="button">Cuisine</button></th>
+          <th data-field="orders" data-col="orders" class="is-num"><button type="button">Orders</button></th>
+          <th data-field="gmv" data-col="gmv" class="is-num" aria-sort="descending"><button type="button">GMV</button></th>
+          <th data-field="on_time" data-col="on_time" class="is-num"><button type="button">On time</button></th>
+          <th data-field="avg_rating" data-col="avg_rating" class="is-num"><button type="button">Rating</button></th>
+          <th data-field="avg_minutes" data-col="avg_minutes" class="is-num fd-hide-narrow"><button type="button">Avg minutes</button></th>
+        </tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </article>
+</div>
+
+<script>
+// Change vs the previous period of the same length, and the rating cost of a late delivery
+dash.calc('kpi_change', {
+  inputs: ['kpis'],
+  title: 'Change vs previous period',
+  description: 'Relative change in orders and GMV, point change in on-time share and rating, vs the previous period of the same length; rating gap = on-time minus late.',
+  fn: (kpis) => {
+    const r4 = (x) => Math.round(x * 10000) / 10000;
+    const num = (x) => (x === null || x === undefined || x === '' ? null : Number(x));
+    return kpis.map((k) => ({
+      period: k.period, city: k.city, cuisine: k.cuisine,
+      orders_change: num(k.prev_orders) ? r4(num(k.orders) / num(k.prev_orders) - 1) : null,
+      gmv_change: num(k.prev_gmv) ? r4(num(k.gmv) / num(k.prev_gmv) - 1) : null,
+      on_time_change: num(k.prev_on_time) === null || num(k.on_time) === null ? null : r4(num(k.on_time) - num(k.prev_on_time)),
+      rating_change: num(k.prev_avg_rating) === null || num(k.avg_rating) === null ? null : r4(num(k.avg_rating) - num(k.prev_avg_rating)),
+      rating_gap: num(k.rating_on_time) === null || num(k.rating_late) === null ? null : r4(num(k.rating_on_time) - num(k.rating_late)),
+    }));
+  },
+});
+</script>
+
+<script>
+(() => {
+  const DEFAULTS = { period: '30d', city: 'All', cuisine: 'All' };
+  const PERIOD_DAYS = { '7d': 7, '30d': 30, '90d': 90 };
+  const $ = (sel) => document.querySelector(sel);
+  const n = (x) => (x === null || x === undefined || x === '' ? null : Number(x));
+  const enc = encodeURIComponent;
+  const where = (obj) => Object.entries(obj).map(([k, v]) => `${enc(k)}=${enc(v)}`).join('&');
+
+  const fmtInt = d3.format(',');
+  const compact = new Intl.NumberFormat('en-IN', { notation: 'compact', maximumFractionDigits: 1 });
+  const rupee = (x) => (x === null ? '—' : '₹' + (Math.abs(x) >= 10000 ? compact.format(x) : fmtInt(Math.round(x))));
+  const rupeeFull = (x) => (x === null ? '—' : '₹' + d3.format(',.0f')(x));
+  const pct = d3.format('.1%');
+  const signedPct = (x) => (x > 0 ? '+' : '') + pct(x);
+  const signedPts = (x) => (x > 0 ? '+' : '') + d3.format('.1f')(x * 100) + ' pts';
+  const signedStars = (x) => (x > 0 ? '+' : '') + d3.format('.2f')(x);
+  const dayFmt = d3.utcFormat('%a, %b %-d');
+  const shortDay = d3.utcFormat('%b %-d');
+
+  const params = () => ({ ...DEFAULTS, ...dash.params() });
+  const setDefaults = () => dash.setParams({ ...DEFAULTS });
+  if (!dash.params().period) setDefaults();
+
+  // ---------- filters ----------
+  const fPeriod = $('#f-period'), fCity = $('#f-city'), fCuisine = $('#f-cuisine');
+  fPeriod.addEventListener('change', () => dash.setParams({ period: fPeriod.value }));
+  fCity.addEventListener('change', () => dash.setParams({ city: fCity.value }));
+  fCuisine.addEventListener('change', () => dash.setParams({ cuisine: fCuisine.value }));
+  $('#f-reset').addEventListener('click', () => { dash.resetParams(); setDefaults(); });
+
+  const fillSelect = (sel, label, values, current) => {
+    const opts = [new Option(label, 'All'), ...values.map((v) => new Option(v, v))];
+    sel.replaceChildren(...opts);
+    sel.value = values.includes(current) ? current : 'All';
+  };
+
+  // ---------- tooltip ----------
+  const tip = (box) => {
+    let el = box.querySelector('.fd-tip');
+    if (!el) { el = document.createElement('div'); el.className = 'fd-tip'; el.hidden = true; box.appendChild(el); }
+    return {
+      show(event, lines) {
+        el.replaceChildren(...lines.map(([cls, text]) => { const d = document.createElement('div'); if (cls) d.className = cls; d.textContent = text; return d; }));
+        el.hidden = false;
+        const b = box.getBoundingClientRect(), t = el.getBoundingClientRect();
+        let x = event.clientX - b.left + 12, y = event.clientY - b.top + 12;
+        if (x + t.width > b.width) x = event.clientX - b.left - t.width - 12;
+        if (y + t.height > b.height) y = Math.max(0, event.clientY - b.top - t.height - 12);
+        el.style.left = Math.max(0, x) + 'px'; el.style.top = y + 'px';
+      },
+      hide() { el.hidden = true; },
+    };
+  };
+
+  const failed = (box, status) => {
+    box.classList.remove('dash-skeleton');
+    box.querySelectorAll('svg, .fd-empty').forEach((e) => e.remove());
+    if (status === 'error' || status === 'connect' || status === 'declined') {
+      const p = document.createElement('p'); p.className = 'fd-empty'; p.textContent = 'Failed to load'; box.appendChild(p);
+    }
+  };
+  const emptyNote = (box, text) => {
+    box.classList.remove('dash-skeleton');
+    box.querySelectorAll('svg, .fd-empty').forEach((e) => e.remove());
+    const p = document.createElement('p'); p.className = 'fd-empty'; p.textContent = text; box.appendChild(p);
+  };
+  const setText = (el, text, ok) => { el.textContent = text; el.classList.toggle('dash-skeleton', !ok); };
+
+  // ---------- trend line ----------
+  const drawTrend = (rows, p) => {
+    const box = $('#chart-trend');
+    box.querySelectorAll('svg, .fd-empty').forEach((e) => e.remove());
+    box.classList.remove('dash-skeleton');
+    const all = rows.filter((r) => r.city === p.city && r.cuisine === p.cuisine)
+      .map((r) => ({ day: new Date(r.day + 'T00:00:00Z'), orders: n(r.orders), gmv: n(r.gmv) }))
+      .sort((a, b) => a.day - b.day);
+    if (!all.length) return emptyNote(box, 'No orders for this selection.');
+    const last = all[all.length - 1].day;
+    const data = PERIOD_DAYS[p.period] ? all.filter((d) => d.day > d3.utcDay.offset(last, -PERIOD_DAYS[p.period])) : all;
+    if (!data.some((d) => d.orders > 0)) return emptyNote(box, 'No orders for this selection.');
+
+    const W = Math.max(280, box.clientWidth), H = 300;
+    const svg = d3.select(box).append('svg').attr('width', '100%').attr('viewBox', `0 0 ${W} ${H}`).attr('role', 'img')
+      .attr('aria-label', 'Orders per day');
+    const yMax = d3.max(data, (d) => d.orders) || 1;
+    const y = d3.scaleLinear([0, yMax * 1.1], [H - 28, 10]).nice();
+    const yTicks = y.ticks(5);
+    const probe = svg.append('text').attr('class', 'fd-label-muted').text(fmtInt(d3.max(yTicks)));
+    const left = Math.ceil(probe.node().getComputedTextLength()) + 12; probe.remove();
+    const x = d3.scaleUtc(d3.extent(data, (d) => d.day), [left, W - 12]);
+
+    svg.append('g').selectAll('line').data(yTicks).join('line').attr('class', 'fd-gridline')
+      .attr('x1', left).attr('x2', W - 12).attr('y1', (t) => y(t)).attr('y2', (t) => y(t));
+    svg.append('g').attr('class', 'fd-axis').attr('transform', `translate(${left},0)`)
+      .call(d3.axisLeft(y).tickValues(yTicks).tickFormat(fmtInt).tickSize(0)).attr('font-size', null).attr('font-family', null)
+      .call((g) => g.select('.domain').remove()).selectAll('text').attr('dx', '-4');
+    const xTicks = Math.max(2, Math.min(8, Math.floor((W - left) / 90)));
+    svg.append('g').attr('class', 'fd-axis').attr('transform', `translate(0,${H - 28})`)
+      .call(d3.axisBottom(x).ticks(xTicks).tickFormat(shortDay).tickSizeOuter(0)).attr('font-size', null).attr('font-family', null);
+
+    const gradId = 'fd-area-grad';
+    const defs = svg.append('defs').append('linearGradient').attr('id', gradId).attr('x1', 0).attr('x2', 0).attr('y1', 0).attr('y2', 1);
+    [[0, .26], [.25, .16], [.5, .08], [.75, .03], [1, 0]].forEach(([o, a]) =>
+      defs.append('stop').attr('offset', o).attr('style', `stop-color: var(--fd-accent); stop-opacity: ${a}`));
+    svg.append('path').datum(data).attr('fill', `url(#${gradId})`)
+      .attr('d', d3.area().x((d) => x(d.day)).y0(y(0)).y1((d) => y(d.orders)));
+    svg.append('path').datum(data).attr('fill', 'none').attr('stroke', 'var(--fd-accent)').attr('stroke-width', 2)
+      .attr('stroke-linejoin', 'round').attr('stroke-linecap', 'round')
+      .attr('d', d3.line().x((d) => x(d.day)).y((d) => y(d.orders)));
+    const weekend = (d) => d.day.getUTCDay() === 0 || d.day.getUTCDay() === 6;
+    svg.append('g').selectAll('circle').data(data.filter(weekend)).join('circle')
+      .attr('cx', (d) => x(d.day)).attr('cy', (d) => y(d.orders)).attr('r', data.length > 60 ? 2.5 : 3.5)
+      .attr('fill', 'var(--fd-hi-fill)');
+
+    const focus = svg.append('circle').attr('r', 5).attr('fill', 'var(--fd-accent)').attr('stroke', 'var(--color-panel)').attr('stroke-width', 2).style('display', 'none');
+    const t = tip(box);
+    const bisect = d3.bisector((d) => d.day).center;
+    svg.append('rect').attr('x', left).attr('y', 0).attr('width', W - left).attr('height', H).attr('fill', 'transparent')
+      .on('pointermove', (event) => {
+        const [mx] = d3.pointer(event);
+        const d = data[bisect(data, x.invert(mx))];
+        focus.style('display', null).attr('cx', x(d.day)).attr('cy', y(d.orders));
+        t.show(event, [['fd-tip-head', dayFmt(d.day) + (weekend(d) ? ' · weekend' : '')], ['', `${fmtInt(d.orders)} orders`], ['', `${rupeeFull(d.gmv)} GMV`]]);
+      })
+      .on('pointerleave', () => { focus.style('display', 'none'); t.hide(); });
+  };
+
+  // ---------- top 10 bars ----------
+  const drawTop10 = (rows) => {
+    const box = $('#chart-top10');
+    box.querySelectorAll('svg, .fd-empty').forEach((e) => e.remove());
+    box.classList.remove('dash-skeleton');
+    const data = rows.filter((r) => n(r.gmv) > 0).sort((a, b) => n(b.gmv) - n(a.gmv)).slice(0, 10);
+    if (!data.length) return emptyNote(box, 'No restaurants for this selection.');
+    const W = Math.max(280, box.clientWidth), row = 28, H = data.length * row + 8;
+    const svg = d3.select(box).append('svg').attr('width', '100%').attr('viewBox', `0 0 ${W} ${H}`).attr('role', 'img')
+      .attr('aria-label', 'Top restaurants by GMV');
+    const labelW = Math.min(W * 0.42, 190);
+    const valueProbe = svg.append('text').attr('class', 'fd-label-muted').text(rupee(n(data[0].gmv)));
+    const valueW = Math.ceil(valueProbe.node().getComputedTextLength()) + 10; valueProbe.remove();
+    const x = d3.scaleLinear([0, n(data[0].gmv)], [0, Math.max(40, W - labelW - valueW - 8)]);
+    const t = tip(box);
+    const g = svg.selectAll('g.bar').data(data).join('g').attr('class', 'bar').attr('transform', (d, i) => `translate(0,${i * row})`);
+    g.append('text').attr('class', 'fd-label').attr('x', 0).attr('y', row / 2 + 4).text((d) => d.restaurant)
+      .each(function () { // truncate long names to the label column
+        let s = this.textContent;
+        while (this.getComputedTextLength() > labelW - 10 && s.length > 4) { s = s.slice(0, -2); this.textContent = s + '…'; }
+      });
+    g.append('rect').attr('x', labelW).attr('y', 6).attr('height', row - 12).attr('rx', 4)
+      .attr('width', (d) => Math.max(2, x(n(d.gmv)))).attr('fill', (d, i) => (i === 0 ? 'var(--fd-hi-fill)' : 'var(--fd-accent)'));
+    g.append('text').attr('class', 'fd-label-muted').attr('x', (d) => labelW + x(n(d.gmv)) + 6).attr('y', row / 2 + 4).text((d) => rupee(n(d.gmv)));
+    g.append('rect').attr('x', 0).attr('y', 0).attr('width', W).attr('height', row).attr('fill', 'transparent')
+      .on('pointermove', (event, d) => t.show(event, [['fd-tip-head', `${d.restaurant} · ${d.city}`], ['', `${rupeeFull(n(d.gmv))} GMV`], ['', `${fmtInt(n(d.orders))} orders · ${d.cuisine}`]]))
+      .on('pointerleave', () => t.hide());
+  };
+
+  // ---------- scatter ----------
+  const drawScatter = (rows) => {
+    const box = $('#chart-scatter');
+    box.querySelectorAll('svg, .fd-empty').forEach((e) => e.remove());
+    box.classList.remove('dash-skeleton');
+    const data = rows.filter((r) => n(r.on_time) !== null && n(r.avg_rating) !== null);
+    if (!data.length) return emptyNote(box, 'No restaurants for this selection.');
+    const W = Math.max(280, box.clientWidth), H = 300, left = 40, bottom = 34;
+    const svg = d3.select(box).append('svg').attr('width', '100%').attr('viewBox', `0 0 ${W} ${H}`).attr('role', 'img')
+      .attr('aria-label', 'On-time share vs rating by restaurant');
+    const xExt = d3.extent(data, (d) => n(d.on_time)), yExt = d3.extent(data, (d) => n(d.avg_rating));
+    const x = d3.scaleLinear([Math.max(0, xExt[0] - 0.03), Math.min(1, xExt[1] + 0.03)], [left, W - 14]).nice();
+    const y = d3.scaleLinear([Math.max(1, yExt[0] - 0.15), Math.min(5, yExt[1] + 0.15)], [H - bottom, 12]).nice();
+    const r = d3.scaleSqrt([0, d3.max(data, (d) => n(d.orders))], [2, 13]);
+    const xTicks = Math.max(2, Math.min(6, Math.floor((W - left) / 70)));
+    svg.append('g').selectAll('line').data(y.ticks(5)).join('line').attr('class', 'fd-gridline')
+      .attr('x1', left).attr('x2', W - 14).attr('y1', (t) => y(t)).attr('y2', (t) => y(t));
+    svg.append('g').attr('class', 'fd-axis').attr('transform', `translate(0,${H - bottom})`)
+      .call(d3.axisBottom(x).ticks(xTicks).tickFormat(d3.format('.0%')).tickSizeOuter(0)).attr('font-size', null).attr('font-family', null);
+    svg.append('g').attr('class', 'fd-axis').attr('transform', `translate(${left},0)`)
+      .call(d3.axisLeft(y).ticks(5).tickFormat(d3.format('.1f')).tickSize(0)).attr('font-size', null).attr('font-family', null)
+      .call((g) => g.select('.domain').remove()).selectAll('text').attr('dx', '-4');
+    svg.append('text').attr('class', 'fd-label-muted').attr('x', W - 14).attr('y', H - 4).attr('text-anchor', 'end').text('On-time share →');
+    svg.append('text').attr('class', 'fd-label-muted').attr('x', left).attr('y', 8).text('Rating ↑');
+    const t = tip(box);
+    svg.append('g').selectAll('circle').data([...data].sort((a, b) => n(b.orders) - n(a.orders))).join('circle')
+      .attr('cx', (d) => x(n(d.on_time))).attr('cy', (d) => y(n(d.avg_rating))).attr('r', (d) => r(n(d.orders)))
+      .attr('fill', 'var(--fd-accent)').attr('fill-opacity', .45).attr('stroke', 'var(--fd-accent)').attr('stroke-width', 1)
+      .on('pointerenter', function () { d3.select(this).attr('fill-opacity', .9); })
+      .on('pointermove', (event, d) => t.show(event, [['fd-tip-head', `${d.restaurant} · ${d.city}`], ['', `${pct(n(d.on_time))} on time`], ['', `${d3.format('.2f')(n(d.avg_rating))}★ average rating`], ['', `${fmtInt(n(d.orders))} orders`]]))
+      .on('pointerleave', function () { d3.select(this).attr('fill-opacity', .45); t.hide(); });
+  };
+
+  // ---------- table ----------
+  let sortCol = 'gmv', sortDir = -1, query = '';
+  const table = $('#t-restaurants'), tbody = table.querySelector('tbody');
+  const NUMERIC = new Set(['orders', 'gmv', 'on_time', 'avg_rating', 'avg_minutes']);
+  table.querySelectorAll('th').forEach((th) => th.querySelector('button').addEventListener('click', () => {
+    const col = th.dataset.col;
+    sortDir = col === sortCol ? -sortDir : (NUMERIC.has(col) ? -1 : 1);
+    sortCol = col;
+    table.querySelectorAll('th').forEach((h) => h.removeAttribute('aria-sort'));
+    th.setAttribute('aria-sort', sortDir === 1 ? 'ascending' : 'descending');
+    draw();
+  }));
+  $('#t-search').addEventListener('input', (e) => { query = e.target.value.trim().toLowerCase(); draw(); });
+
+  const drawTable = (rows) => {
+    const maxGmv = d3.max(rows, (r) => n(r.gmv)) || 1;
+    const shown = rows.filter((r) => !query || `${r.restaurant} ${r.city} ${r.cuisine}`.toLowerCase().includes(query))
+      .sort((a, b) => {
+        const va = NUMERIC.has(sortCol) ? n(a[sortCol]) : String(a[sortCol]), vb = NUMERIC.has(sortCol) ? n(b[sortCol]) : String(b[sortCol]);
+        if (va === null) return 1; if (vb === null) return -1;
+        return (NUMERIC.has(sortCol) ? va - vb : va.localeCompare(vb)) * sortDir;
+      });
+    tbody.replaceChildren(...shown.map((r) => {
+      const tr = document.createElement('tr');
+      tr.dataset.key = `${enc(r.period)},${enc(r.restaurant_id)}`;
+      const cell = (text, cls) => { const td = document.createElement('td'); if (cls) td.className = cls; td.textContent = text; return td; };
+      const gmvTd = document.createElement('td'); gmvTd.className = 'is-num';
+      const wrap = document.createElement('span'); wrap.className = 'fd-bar-cell';
+      const bar = document.createElement('i'); bar.style.width = Math.max(2, (n(r.gmv) / maxGmv) * 56) + 'px';
+      const val = document.createElement('span'); val.textContent = rupeeFull(n(r.gmv));
+      wrap.append(bar, val); gmvTd.append(wrap);
+      tr.append(
+        cell(r.restaurant), cell(r.city), cell(r.cuisine, 'fd-hide-narrow'), cell(fmtInt(n(r.orders)), 'is-num'), gmvTd,
+        cell(n(r.on_time) === null ? '—' : pct(n(r.on_time)), 'is-num'),
+        cell(n(r.avg_rating) === null ? '—' : d3.format('.2f')(n(r.avg_rating)), 'is-num'),
+        cell(n(r.avg_minutes) === null ? '—' : d3.format('.1f')(n(r.avg_minutes)), 'is-num fd-hide-narrow'),
+      );
+      return tr;
+    }));
+    $('#table-count').textContent = `${shown.length} of ${rows.length} restaurants · click a column to sort`;
+  };
+
+  // ---------- main draw ----------
+  function draw() {
+    const p = params();
+    const K = dash.data('kpis'), C = dash.data('kpi_change'), D = dash.data('daily'), R = dash.data('restaurants');
+
+    if (fPeriod !== document.activeElement) fPeriod.value = p.period;
+    if (R.status === 'ok') {
+      const uniq = (k) => [...new Set(R.data.map((r) => r[k]))].sort();
+      if (fCity !== document.activeElement) fillSelect(fCity, 'All cities', uniq('city'), p.city);
+      if (fCuisine !== document.activeElement) fillSelect(fCuisine, 'All cuisines', uniq('cuisine'), p.cuisine);
+    }
+
+    const key = where({ period: p.period, city: p.city, cuisine: p.cuisine });
+    const k = K.status === 'ok' ? K.data.find((r) => r.period === p.period && r.city === p.city && r.cuisine === p.cuisine) : null;
+    const c = C.status === 'ok' && Array.isArray(C.data) ? C.data.find((r) => r.period === p.period && r.city === p.city && r.cuisine === p.cuisine) : null;
+
+    // header takeaway + insight titles
+    document.querySelectorAll('[data-source="kpis"][data-field], [data-source="kpi_change"][data-field]').forEach((el) => el.setAttribute('data-where', key));
+    const fmtField = { rating_late: (v) => d3.format('.2f')(v), rating_on_time: (v) => d3.format('.2f')(v), on_time: pct, weekend_uplift: (v) => d3.format('.0%')(v), rating_gap: (v) => d3.format('.1f')(v) };
+    [['#tk-late', 'rating_late'], ['#tk-ontime', 'rating_on_time'], ['#tk-ot', 'on_time'], ['#t-uplift', 'weekend_uplift'], ['#s-late', 'rating_late'], ['#s-ontime', 'rating_on_time']].forEach(([sel, f]) => {
+      const v = k ? n(k[f]) : null; setText($(sel), v === null ? '—' : fmtField[f](v), !!k);
+    });
+    setText($('#tk-gap'), c && n(c.rating_gap) !== null ? fmtField.rating_gap(n(c.rating_gap)) : '—', !!c);
+
+    // KPI cards
+    const kpiFmt = { orders: (v) => fmtInt(v), gmv: rupee, on_time: pct, avg_rating: (v) => d3.format('.2f')(v) };
+    const changeField = { orders: 'orders_change', gmv: 'gmv_change', on_time: 'on_time_change', avg_rating: 'rating_change' };
+    const changeFmt = { orders: signedPct, gmv: signedPct, on_time: signedPts, avg_rating: signedStars };
+    const days = PERIOD_DAYS[p.period];
+    document.querySelectorAll('[data-kpi]').forEach((el) => {
+      const f = el.dataset.kpi, v = k ? n(k[f]) : null;
+      setText(el, v === null ? '—' : kpiFmt[f](v), !!k);
+      const delta = document.querySelector(`[data-delta="${f}"]`);
+      const ch = c ? n(c[changeField[f]]) : null;
+      delta.classList.toggle('is-up', ch !== null && ch > 0);
+      delta.classList.toggle('is-down', ch !== null && ch < 0);
+      delta.querySelector('.fd-arrow').textContent = ch === null ? '' : ch > 0 ? '▲' : ch < 0 ? '▼' : '■';
+      delta.querySelector('.fd-change').textContent = ch === null ? '' : changeFmt[f](ch);
+      delta.querySelector('.fd-vs').textContent = ch === null ? (k ? 'No earlier period in the data to compare' : '') : `vs previous ${days} days`;
+    });
+    document.querySelectorAll('[data-window]').forEach((el) => { el.textContent = k ? `${k.period_label} · ${k.window}` : '—'; });
+
+    // charts and table
+    if (D.status === 'ok') drawTrend(D.data, p); else failed($('#chart-trend'), D.status);
+    if (R.status === 'ok') {
+      const rows = R.data.filter((r) => r.period === p.period && (p.city === 'All' || r.city === p.city) && (p.cuisine === 'All' || r.cuisine === p.cuisine));
+      const top = [...rows].sort((a, b) => n(b.gmv) - n(a.gmv))[0];
+      ['#b-top', '#b-top-gmv'].forEach((sel) => {
+        const el = $(sel);
+        if (top) el.setAttribute('data-where', where({ period: top.period, restaurant_id: top.restaurant_id })); else el.removeAttribute('data-where');
+      });
+      setText($('#b-top'), top ? top.restaurant : 'No restaurant', true);
+      setText($('#b-top-gmv'), top ? rupee(n(top.gmv)) : '—', true);
+      drawTop10(rows); drawScatter(rows); drawTable(rows);
+    } else {
+      failed($('#chart-top10'), R.status); failed($('#chart-scatter'), R.status);
+    }
+  }
+
+  dash.onData(draw);
+})();
+</script>

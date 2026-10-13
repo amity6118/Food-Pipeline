@@ -28,6 +28,7 @@ pipeline-health page.
 - [Testing and reconciliation](#testing-and-reconciliation)
 - [Verifying the warehouse](#verifying-the-warehouse)
 - [Connecting Power BI](#connecting-power-bi)
+- [Web dashboard](#web-dashboard)
 - [Suggested DAX measures](#suggested-dax-measures)
 - [Suggested report pages](#suggested-report-pages)
 - [What's built](#whats-built)
@@ -131,6 +132,7 @@ food-order-pipeline/
 ├── requirements.txt            # exact pins for reproducible builds
 ├── pytest.ini
 ├── powerbi/                    # Power BI project: FoodOrderAnalytics.pbip (model + report)
+├── dashboard/                  # web dashboard: page (index.html) + data build script
 ├── docs/
 │   ├── ARCHITECTURE.md         # detailed diagrams
 │   └── images/                 # architecture + star schema images
@@ -152,7 +154,8 @@ food-order-pipeline/
 │   │   ├── 11_procedures_orchestration.sql # sp_run_warehouse_load, sp_reset_warehouse
 │   │   └── 99_create_app_users.sh          # ETL + Power BI users from .env
 │   └── validation/
-│       └── reconciliation.sql  # staging ↔ warehouse row-count reconciliation
+│       ├── reconciliation.sql  # staging ↔ warehouse row-count reconciliation
+│       └── kpi_crosscheck.sql  # headline KPIs in SQL, to check the Power BI numbers
 ├── src/
 │   ├── config.py               # all settings from environment variables
 │   ├── generator/              # seeded platform model, order stream, mock API
@@ -174,7 +177,7 @@ food-order-pipeline/
 
 - Windows 10/11 with **Docker Desktop** (WSL 2 backend), running
 - **Git**
-- **Power BI Desktop** plus **MySQL Connector/NET 8.x** (needed by Power BI's MySQL connector)
+- **Power BI Desktop** plus **MySQL Connector/NET 8.0.28** (needed by Power BI's MySQL connector; see [Troubleshooting the connection](#troubleshooting-the-connection))
 
 ### 1. Clone and configure
 
@@ -406,16 +409,32 @@ plain-text files that git can diff. The semantic model is already built:
 
 ### Open it
 
-1. Install **MySQL Connector/NET 8.x** (https://dev.mysql.com/downloads/connector/net/).
-   Power BI's MySQL connector needs it. Restart Power BI Desktop afterwards.
+1. Install **MySQL Connector/NET 8.0.28** (https://downloads.mysql.com/archives/c-net/,
+   Product Version 8.0.28), then restart Power BI Desktop. Power BI's MySQL
+   connector needs it.
 2. Start the stack and load some data (see [Running the pipeline](#running-the-pipeline)).
 3. Open `powerbi/FoodOrderAnalytics.pbip` in Power BI Desktop and click **Refresh**.
-4. When asked for credentials for `localhost:3306`, choose the **Database** tab and
-   enter `POWERBI_USER` / `POWERBI_PASSWORD` from your `.env`. Power BI stores
-   them locally, not in the project files.
+4. When asked for credentials for `localhost:3306`, click **Database** in the
+   dialog's left-hand list (the dialog opens on **Windows**), then enter
+   `POWERBI_USER` / `POWERBI_PASSWORD` from your `.env`. Power BI stores them
+   locally, not in the project files.
+5. If it says it can't connect with an encrypted connection, click **OK**: the
+   MySQL container uses a self-signed certificate and the traffic stays on your PC.
 
 If MySQL is not on `localhost:3306`, change the `MySQLServer` parameter under
 **Transform data → Edit parameters**.
+
+### Troubleshooting the connection
+
+| Symptom | Cause | Fix |
+|---|---|---|
+| *We were unable to find a database provider with invariant name 'MySql.Data.MySqlClient'* | Connector/NET is not installed, or the installer registered it only for 32-bit .NET while Power BI is 64-bit | Install **8.0.28**, which registers both, and restart Power BI |
+| *Failed to find or load the registered .Net Framework Data Provider* | Connector/NET **8.0.29 and later** installers ship `MySql.Data.dll` without the libraries it depends on (Google.Protobuf, K4os LZ4, BouncyCastle, …) | Uninstall that version and install **8.0.28** |
+| Credentials are refused every time | They were saved on the **Windows** tab, so the driver logs in as `auth_windows` | **Transform data → Data source settings → Global permissions** → select `localhost:3306` → **Clear Permissions**, then refresh and use the **Database** tab |
+| Still refused on the Database tab | The password does not match `.env` (random 24-character passwords contain look-alikes such as `l`/`I`/`1`) | Copy the value after `POWERBI_PASSWORD=` from `.env` and paste it |
+
+MySQL shows which account a failed attempt used:
+`SELECT USER, HOST, TOTAL_CONNECTIONS FROM performance_schema.accounts;`
 
 The MySQL connector returns `TINYINT(1)` columns as true/false. The project's
 queries convert those flags (`is_late`, `is_weekend`, …) back to 1/0, so the
@@ -427,6 +446,33 @@ measures below work as written.
 mode, **Database** credentials as above. Load the `fact_*` and `dim_*` tables,
 check the relationships on the `*_key` columns and mark `dim_date` as the date
 table. Add a second source for `food_control` for the pipeline-health page.
+
+---
+
+## Web dashboard
+
+An interactive web dashboard, **Food Delivery Performance**, is built on the same
+warehouse as a companion to the Power BI report. It answers one question for
+operations: where revenue comes from, and whether delivery speed is hurting ratings.
+
+- A dark header with the headline finding (late deliveries rate about a star lower)
+- Filters for date range (last 7 / 30 / 90 days, all data), city and cuisine that update every element
+- KPI cards for orders, delivered GMV, on-time % and average rating, each with an
+  arrow for the change vs the previous period of the same length
+- Orders per day with weekends highlighted, the top 10 restaurants by GMV, an
+  on-time-vs-rating scatter per restaurant, and a searchable, sortable restaurant table
+
+Its source is in `dashboard/`: `index.html` is the page, and
+`build_datasets.py` rebuilds its three data files from the warehouse, using the
+same metric definitions as the Power BI measures:
+
+```powershell
+docker compose run --rm etl python -m dashboard.build_datasets   # writes dashboard/data/*.json
+```
+
+The dashboard is hosted as a private claude.ai artifact. It holds a snapshot of
+the data taken when its files were last uploaded, so it does not refresh when
+the pipeline runs.
 
 ---
 
@@ -502,6 +548,7 @@ RETURN
 - [x] Structured JSON logging; full audit trail in `food_control`
 - [x] 64 pytest tests (unit + MySQL integration) and a reconciliation script
 - [x] Power BI project (`.pbip`): semantic model with relationships, date table, all measures, and 5 report pages
+- [x] Interactive web dashboard with filters, trend arrows, insight titles and a searchable restaurant table
 
 ## Next steps
 

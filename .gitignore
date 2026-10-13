@@ -56,3 +56,6 @@ Thumbs.db
 # Power BI Desktop local files (cached data and per-user settings)
 **/.pbi/localSettings.json
 **/.pbi/cache.abf
+
+# Generated dashboard data (rebuild with: python -m dashboard.build_datasets)
+dashboard/data/
