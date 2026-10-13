@@ -7,6 +7,7 @@ points MYSQL_HOST at the `mysql` service while host-side runs use `localhost`.
 """
 
 import os
+from datetime import date
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -24,6 +25,10 @@ MYSQL_PASSWORD = os.getenv("MYSQL_PASSWORD", "")
 STAGING_DB = os.getenv("STAGING_DB", "food_staging")
 CONTROL_DB = os.getenv("CONTROL_DB", "food_control")
 DW_DB = os.getenv("DW_DB", "food_dw")
+
+# Calendar covered by dim_date; run dates and generated data must fall inside it
+CALENDAR_START = date(2023, 1, 1)
+CALENDAR_END = date(2027, 12, 31)
 
 # Mock source API
 MOCK_API_BASE_URL = os.getenv("MOCK_API_BASE_URL", "http://localhost:8000")
