@@ -1,10 +1,10 @@
 #!/bin/bash
 # ============================================================================
-# 10_create_app_users.sh
+# 99_create_app_users.sh
 # Description: Creates the ETL service account and the Power BI read-only user
 # with credentials taken from environment variables (.env), so no password is
 # ever stored in the repository.
-# Runs once, on first MySQL container boot, via /docker-entrypoint-initdb.d.
+# Runs once, last, on first MySQL container boot via /docker-entrypoint-initdb.d.
 # ============================================================================
 
 : "${MYSQL_USER:?MYSQL_USER must be set in .env}"

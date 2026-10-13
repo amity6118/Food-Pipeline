@@ -74,14 +74,14 @@ can report on.
 
 | Table | Grain / type | Notes |
 |---|---|---|
-| `fact_orders` | One row per order | `net_amount = gross_amount - discount + delivery_fee`; `is_late` flag; mapped `order_status` |
-| `fact_order_items` | One row per item per order | `line_total = quantity × unit_price` |
-| `dim_customer` | SCD Type 2 | Full history of customer attribute changes |
-| `dim_restaurant` | SCD Type 2 | Full history of restaurant attribute changes |
+| `fact_orders` | One row per order | Upsert on `order_id`. `net_amount = gross_amount - discount + delivery_fee`; `is_late` flag; `order_status` mapped to `DELIVERED` / `CANCELLED` / `REFUNDED`. CHECK constraints guard amounts and ratings |
+| `fact_order_items` | One row per item per order | Unique on `(order_key, menu_item_key)`; `line_total = quantity × unit_price` |
+| `dim_customer` | SCD Type 2 | `row_hash` detects changes. `valid_from` / `valid_to` / `is_current`, with a generated-column unique key that allows only one current row per customer |
+| `dim_restaurant` | SCD Type 2 | Same SCD2 pattern as `dim_customer` |
 | `dim_menu_item` | SCD Type 1 | Upsert on `item_id` |
 | `dim_delivery_partner` | SCD Type 1 | Upsert on `partner_id` |
-| `dim_payment_method` | Static | Seeded at init |
-| `dim_date` | One row per day, 2023–2027 | Weekend flag plus Indian national holidays and festivals (Holi, Eid, Dussehra, Diwali) |
+| `dim_payment_method` | SCD Type 1 | Upsert on `payment_method_id` (from `payment_methods.csv`) |
+| `dim_date` | One row per day, 2023–2027 | ISO weekday, `is_weekend`, `is_holiday` (national), `is_festival` (Holi, Id-ul-Fitr, Dussehra, Diwali, Christmas, New Year), driven by the `ref_indian_holidays` table |
 
 ---
 
@@ -129,10 +129,10 @@ food-order-pipeline/
 │   │   ├── 02_create_staging_tables.sql
 │   │   ├── 03_create_control_tables.sql
 │   │   ├── 04_create_dw_tables.sql
-│   │   ├── 05_seed_control_data.sql
-│   │   ├── 06_init_dim_date.sql
-│   │   └── 10_create_app_users.sh
-│   └── procedures/
+│   │   ├── 05_create_cleansing_functions.sql
+│   │   ├── 06_create_dim_date.sql
+│   │   ├── 07_seed_control_data.sql   # watermarks + DQ rule catalogue
+│   │   └── 99_create_app_users.sh     # ETL + Power BI users from .env
 ├── src/
 │   ├── config.py               # all settings from environment variables
 │   ├── generator/              # Faker data generators + mock orders API
@@ -200,9 +200,9 @@ docker compose logs etl
 ```
 
 ```
-[...] [INFO] [src.utils.healthcheck]: food_staging  OK (7 tables)
+[...] [INFO] [src.utils.healthcheck]: food_staging  OK (9 tables)
 [...] [INFO] [src.utils.healthcheck]: food_control  OK (5 tables)
-[...] [INFO] [src.utils.healthcheck]: food_dw       OK (8 tables)
+[...] [INFO] [src.utils.healthcheck]: food_dw       OK (9 tables)
 ```
 
 Re-run the check at any time with
@@ -232,17 +232,24 @@ docker exec -it food_order_mysql mysql -uroot -p
 SHOW DATABASES LIKE 'food_%';
 -- food_control, food_dw, food_staging
 
-SELECT COUNT(*) AS days, MIN(full_date), MAX(full_date) FROM food_dw.dim_date;
--- 1826 | 2023-01-01 | 2027-12-31
+SELECT COUNT(*) AS days, MIN(full_date), MAX(full_date),
+       SUM(is_holiday) AS national_holidays, SUM(is_festival) AS festival_days
+FROM food_dw.dim_date;
+-- 1826 | 2023-01-01 | 2027-12-31 | 15 | 35
 
-SELECT full_date, holiday_name FROM food_dw.dim_date
-WHERE is_holiday = 1 AND year = 2026 ORDER BY full_date;
--- New Year's Day, Republic Day, Holi, Eid-ul-Fitr, ... Diwali, Christmas Day
+SELECT full_date, day_name, holiday_name FROM food_dw.dim_date
+WHERE (is_holiday = 1 OR is_festival = 1) AND year = 2026 ORDER BY full_date;
+-- 10 rows: New Year's Day, Republic Day, Holi (03-04), Id-ul-Fitr (03-21),
+--          Independence Day, Gandhi Jayanti, Dussehra (10-20), Diwali (11-08),
+--          Christmas, New Year's Eve
 
-SELECT COUNT(*) FROM food_control.dq_rules;        -- 10
-SELECT COUNT(*) FROM food_dw.dim_payment_method;   -- 6
+SELECT food_staging.fn_to_datetime('2024-02-31 25:99:99') AS dirty,    -- NULL
+       food_staging.fn_to_decimal(' 120.50 ')             AS amount;   -- 120.50
 
-SELECT user, host FROM mysql.user WHERE user IN ('etl_user', 'powerbi_reader');
+SELECT stage, severity, COUNT(*) FROM food_control.dq_rules GROUP BY stage, severity;
+-- STAGING FAIL 2 | STAGING WARN 10 | WAREHOUSE FAIL 4 | WAREHOUSE WARN 4
+
+SELECT user, plugin FROM mysql.user WHERE user IN ('etl_user', 'powerbi_reader');
 SHOW GRANTS FOR 'powerbi_reader'@'%';
 -- SELECT on food_dw.* and food_control.* only
 ```
@@ -338,7 +345,7 @@ RETURN
 | Phase | Scope | Status |
 |---|---|---|
 | 1 | Docker Compose, project skeleton, environment config | ✅ Done |
-| 2 | Databases, staging/control/warehouse DDL, `dim_date`, Power BI user | ✅ Done (SCD2 columns pending) |
+| 2 | Databases, staging/control/warehouse DDL, `dim_date`, cleansing functions, DQ rule catalogue, Power BI user | ✅ Done |
 | 3 | Faker generators, dirty-data injection, mock orders API | 🚧 Generators done, API serves `/health` only |
 | 4 | Ingestion package (extract, validate, parse, load, archive) | ⏳ Planned |
 | 5 | Stored-procedure ETL (dimensions, SCD2, facts, watermarks) | ⏳ Planned |

@@ -210,11 +210,12 @@ food-order-pipeline/
 │   └── mock_api/  Dockerfile
 ├── sql/
 │   ├── init/                        # runs once on first MySQL boot
-│   │   01_create_databases.sql      02_staging_tables.sql
-│   │   03_control_tables.sql        04_dw_tables.sql
-│   │   05_seed_control_data.sql     06_dim_date.sql
-│   │   07_procedures_dimensions.sql 08_procedures_facts.sql
-│   │   09_procedure_master.sql      10_create_app_users.sh  # users from .env
+│   │   01_create_databases.sql           02_create_staging_tables.sql
+│   │   03_create_control_tables.sql      04_create_dw_tables.sql
+│   │   05_create_cleansing_functions.sql 06_create_dim_date.sql
+│   │   07_seed_control_data.sql          08_procedures_dimensions.sql
+│   │   09_procedures_facts.sql           10_procedure_master.sql
+│   │   99_create_app_users.sh            # users from .env, runs last
 │   └── validation/
 │       reconciliation.sql           # staging ↔ DW row counts
 ├── src/

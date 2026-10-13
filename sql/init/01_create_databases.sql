@@ -2,7 +2,7 @@
 -- 01_create_databases.sql
 -- Description: Creates the staging, control and warehouse databases.
 -- Application users (ETL + Power BI read-only) are created by
--- 10_create_app_users.sh, because plain .sql init scripts cannot read
+-- 99_create_app_users.sh, because plain .sql init scripts cannot read
 -- credentials from environment variables.
 -- ============================================================================
 
